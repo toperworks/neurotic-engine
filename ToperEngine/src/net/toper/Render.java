@@ -165,10 +165,19 @@ public class Render {
 
 	// Fills a circular area, x and y are the center, and r is the radius
 	public static void fillCircle(Frame f, int xPos, int yPos, int r, int color) {
-		for (float y = -r; y <= r; y += 0.5)
-			for (float x = -r; x <= r; x += 0.5)
-				if (x * x + y * y <= r * r + r * 0.8f)
-					setPixel(f, (int) (xPos + x + x), (int) (yPos + y + y), color);
+		for (float y = -r; y <= r; y += 0.5) {
+			int ya = (int) (yPos + y + y);
+			if (ya >= 0 && ya <= f.getHeight()) {
+				for (float x = -r; x <= r; x += 0.5) {
+					int xa = (int) (xPos + x + x);
+					if (xa >= 0 && xa <= f.getWidth()) {
+						if (x * x + y * y <= r * r + r * 0.8f) {
+							setPixel(f, xa, ya, color);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// Draws a line from the x and y start points to the x and y stop points,
