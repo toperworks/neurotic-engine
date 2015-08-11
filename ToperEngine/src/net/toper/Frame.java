@@ -178,10 +178,11 @@ public class Frame {
 	public void addToTitle(String string) {
 		f.setTitle(title + string);
 	}
-	
-	//Sets title equal to newTitle
-	public void setTitle(String newTitle){
+
+	// Sets title equal to newTitle
+	public void setTitle(String newTitle) {
 		title = newTitle;
+		f.setTitle(title);
 	}
 
 	// Returns the time between frames, use when animating
