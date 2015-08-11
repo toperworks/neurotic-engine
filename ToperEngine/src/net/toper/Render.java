@@ -155,23 +155,30 @@ public class Render {
 
 	// Draws an outline of a circle, x and y are the center, r is the radius
 	public static void drawCircle(Frame f, int xPos, int yPos, int radius, int color) {
-		for (double i = 0; i < 360; i += 0.05) {
-			double angle = i;
-			int y = (int) (radius * Math.sin(angle * Math.PI / 180)) + yPos;
-			int x = (int) (radius * Math.cos(angle * Math.PI / 180)) + xPos;
-			setPixel(f, x, y, color);
+		for (float y = -radius; y <= radius; y += 0.5) {
+			int ya = (int) (yPos + y + y);
+			if (ya >= 0 && ya <= f.getScaledHeight()) {
+				for (float x = -radius; x <= radius; x += 0.5) {
+					int xa = (int) (xPos + x + x);
+					if (xa >= 0 && xa <= f.getScaledWidth()) {
+						if (x * x + y * y < radius * radius + radius * 0.8f && x * x + y * y > (radius * radius + radius * 0.8f) - radius) {
+							setPixel(f, xa, ya, color);
+						}
+					}
+				}
+			}
 		}
 	}
 
 	// Fills a circular area, x and y are the center, and r is the radius
-	public static void fillCircle(Frame f, int xPos, int yPos, int r, int color) {
-		for (float y = -r; y <= r; y += 0.5) {
+	public static void fillCircle(Frame f, int xPos, int yPos, int radius, int color) {
+		for (float y = -radius; y <= radius; y += 0.5) {
 			int ya = (int) (yPos + y + y);
 			if (ya >= 0 && ya <= f.getScaledHeight()) {
-				for (float x = -r; x <= r; x += 0.5) {
+				for (float x = -radius; x <= radius; x += 0.5) {
 					int xa = (int) (xPos + x + x);
 					if (xa >= 0 && xa <= f.getScaledWidth()) {
-						if (x * x + y * y <= r * r + r * 0.8f) {
+						if (x * x + y * y <= radius * radius + radius * 0.8f) {
 							setPixel(f, xa, ya, color);
 						}
 					}
