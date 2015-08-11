@@ -97,42 +97,34 @@ public class ResourceManager {
 		final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 		final int width = image.getWidth();
 		final int height = image.getHeight();
-		final boolean hasAlphaChannel = image.getAlphaRaster() != null;
+		final boolean hasAlpha = image.getAlphaRaster() != null;
 
 		int[] result = new int[height * width];
-		if (hasAlphaChannel) {
+		if (hasAlpha) {
 			final int pixelLength = 4;
-			for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
-				int argb = 0;
-				argb += (((int) pixels[pixel] & 0xff) << 24); // alpha
-				argb += ((int) pixels[pixel + 1] & 0xff); // blue
-				argb += (((int) pixels[pixel + 2] & 0xff) << 8); // green
-				argb += (((int) pixels[pixel + 3] & 0xff) << 16); // red
+			for (int pixel = 0, yPos = 0, xPos = 0; pixel < pixels.length; pixel += pixelLength) {
+				int hex = 0;
+				hex += (((int) pixels[pixel] & 0xff) << 24); // alpha
+				hex += ((int) pixels[pixel + 1] & 0xff); // blue
+				hex += (((int) pixels[pixel + 2] & 0xff) << 8); // green
+				hex += (((int) pixels[pixel + 3] & 0xff) << 16); // red
 
-				if (col + row < result.length)
-					result[col + row] = argb;
-				if (col == width) {
-					col = 0;
-					row += width;
-				}
-				col++;
+				if (xPos + yPos < result.length)
+					result[xPos + yPos * width] = hex;
+				xPos++;
 			}
 
 		} else {
 			final int pixelLength = 3;
-			for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
-				int argb = 0;
-				argb += -16777216; // 255 alpha
-				argb += ((int) pixels[pixel] & 0xff); // blue
-				argb += (((int) pixels[pixel + 1] & 0xff) << 8); // green
-				argb += (((int) pixels[pixel + 2] & 0xff) << 16); // red
-				if (col + row < result.length)
-					result[col + row] = argb;
-				if (col == width) {
-					col = 0;
-					row += width;
-				}
-				col++;
+			for (int pixel = 0, yPos = 0, xPos = 0; pixel < pixels.length; pixel += pixelLength) {
+				int hex = 0;
+				hex += -16777216; // 255 alpha
+				hex += ((int) pixels[pixel] & 0xff); // blue
+				hex += (((int) pixels[pixel + 1] & 0xff) << 8); // green
+				hex += (((int) pixels[pixel + 2] & 0xff) << 16); // red
+				if (xPos + yPos < result.length)
+					result[xPos + yPos * width] = hex;
+				xPos++;
 			}
 
 		}
