@@ -44,8 +44,8 @@ public class Render {
 						int xScreen = (int) (x + xPos);
 						if (xScreen >= 0 && xScreen <= f.getScaledWidth()) {
 							int hex = t.getData(xTex + yTex * t.getScaledWidth());
-							if (hex != excludeHex) {
-								setPixel(f, xScreen, yScreen, hex);
+								if (hex != excludeHex) {
+									setPixel(f, xScreen, yScreen, hex);
 							}
 						}
 					}
@@ -88,7 +88,7 @@ public class Render {
 	// Simplest way to render a texture, draws full texture (t) at xPos and yPos
 	// on the screen.
 	public static void simpleRender(Frame f, Texture t, int xPos, int yPos) {
-		render(f, t, xPos, yPos, 0, 0, t.getWidth(), t.getHeight(), -1, 0);
+		render(f, t, xPos, yPos, 0, 0, t.getWidth(), t.getHeight(), -9, 0);
 	}
 
 	// Blends two hexadecimal colors, hex1 and hex2, together, and the amount of
