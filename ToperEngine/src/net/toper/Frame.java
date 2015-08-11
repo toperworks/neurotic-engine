@@ -178,6 +178,11 @@ public class Frame {
 	public void addToTitle(String string) {
 		f.setTitle(title + string);
 	}
+	
+	//Sets title equal to newTitle
+	public void setTitle(String newTitle){
+		title = newTitle;
+	}
 
 	// Returns the time between frames, use when animating
 	public float getDelta() {
