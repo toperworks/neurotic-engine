@@ -10,7 +10,7 @@ import javax.swing.KeyStroke;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener {
 
-	private static boolean[] keyboard = new boolean[999];
+	private static boolean[] keyboard = new boolean[1808];
 	private static int mouseX, mouseY, mouseButton;
 
 	public static int UP = KeyEvent.VK_UP;
@@ -50,6 +50,11 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 	public static int F10 = KeyEvent.VK_F10;
 	public static int F11 = KeyEvent.VK_F11;
 	public static int F12 = KeyEvent.VK_F12;
+	public static int DELETE = KeyEvent.VK_DELETE;
+	public static int END = KeyEvent.VK_END;
+	public static int HOME = KeyEvent.VK_HOME;
+	public static int PG_UP = KeyEvent.VK_PAGE_UP;
+	public static int PG_DOWN = KeyEvent.VK_PAGE_DOWN;
 
 	private static Frame f;
 
