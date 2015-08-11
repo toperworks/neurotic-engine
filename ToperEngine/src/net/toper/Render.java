@@ -132,7 +132,8 @@ public class Render {
 	public static void fillRect(Frame f, int xPos, int yPos, int width, int height, int color) {
 		for (int y = yPos; y < yPos + height; y++) {
 			for (int x = xPos; x < xPos + width; x++) {
-				setPixel(f, x, y, color);
+				if (y >= 0 && y <= f.getScaledHeight() && x >= 0 && x <= f.getScaledWidth())
+					setPixel(f, x, y, color);
 			}
 		}
 	}
@@ -140,16 +141,20 @@ public class Render {
 	// Draws the outline of a rectangle, x and y are the top-left corner
 	public static void drawRect(Frame f, int xPos, int yPos, int width, int height, int color) {
 		for (int y = yPos; y < yPos + height; y++) {
-			setPixel(f, xPos, y, color);
+			if (y >= 0 && y <= f.getScaledHeight())
+				setPixel(f, xPos, y, color);
 		}
 		for (int y = yPos; y < yPos + height; y++) {
-			setPixel(f, xPos + width, y, color);
+			if (y >= 0 && y <= f.getScaledHeight())
+				setPixel(f, xPos + width, y, color);
 		}
 		for (int x = xPos; x < xPos + width; x++) {
-			setPixel(f, x, yPos, color);
+			if (x >= 0 && x <= f.getScaledWidth())
+				setPixel(f, x, yPos, color);
 		}
 		for (int x = xPos; x < xPos + width; x++) {
-			setPixel(f, x, yPos + height, color);
+			if (x >= 0 && x <= f.getScaledWidth())
+				setPixel(f, x, yPos + height, color);
 		}
 	}
 
