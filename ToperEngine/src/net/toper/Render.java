@@ -44,8 +44,8 @@ public class Render {
 						int xScreen = (int) (x + xPos);
 						if (xScreen >= 0 && xScreen <= f.getScaledWidth()) {
 							int hex = t.getData(xTex + yTex * t.getScaledWidth());
-								if (hex != excludeHex) {
-									setPixel(f, xScreen, yScreen, hex);
+							if (hex != excludeHex) {
+								setPixel(f, xScreen, yScreen, hex);
 							}
 						}
 					}
