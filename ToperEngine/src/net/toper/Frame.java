@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 
 public class Frame {
 
-	public static final String ENGINE_VERSION = "Neurotic Engine Version 0.6b5 | Build Date 8/1/15";
+	public static final String ENGINE_VERSION = "Neurotic Engine Version 0.6b6 | Build Date 8/11/15";
 
 	private JFrame f;
 	private Canvas c;
