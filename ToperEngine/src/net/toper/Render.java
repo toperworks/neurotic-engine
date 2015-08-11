@@ -123,13 +123,10 @@ public class Render {
 
 	// Fills a circular area, x and y are the center, and r is the radius
 	public static void fillCircle(Frame f, int xPos, int yPos, int r, int color) {
-		for (int i = 0; i < r * 2; i++)
-			for (int j = 0; j < r * 2; j++) {
-				int d = (int) Math.sqrt((i - r) * (i - r) + (j - r) * (j - r));
-				if (d < r && i >= 0 && j >= 0) {
-					setPixel(f, i + xPos - r, j + yPos - r, color);
-				}
-			}
+		for (float y = -r; y <= r; y += 0.5)
+			for (float x = -r; x <= r; x += 0.5)
+				if (x * x + y * y <= r * r + r * 0.8f)
+					setPixel(f, (int) (xPos + x + x), (int) (yPos + y + y), color);
 	}
 
 	public static void drawLine(Frame f, int xStart, int yStart, int xStop, int yStop, int color) {
