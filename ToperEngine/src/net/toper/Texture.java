@@ -122,7 +122,7 @@ public class Texture {
 		if (index >= 0 && index < origPixelArray.length)
 			return origPixelArray[index];
 		else
-			return 0xff000000;
+			return 0x00000000;
 	}
 
 	// Rotates a section of the texture around its center
