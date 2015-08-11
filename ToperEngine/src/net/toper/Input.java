@@ -38,6 +38,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 	public static int NUMPAD8 = KeyEvent.VK_NUMPAD8;
 	public static int NUMPAD9 = KeyEvent.VK_NUMPAD9;
 	public static int NUMPAD0 = KeyEvent.VK_NUMPAD0;
+	public static int NUMLOCK = KeyEvent.VK_NUM_LOCK;
 	public static int F1 = KeyEvent.VK_F1;
 	public static int F2 = KeyEvent.VK_F2;
 	public static int F3 = KeyEvent.VK_F3;
@@ -55,6 +56,7 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener {
 	public static int HOME = KeyEvent.VK_HOME;
 	public static int PG_UP = KeyEvent.VK_PAGE_UP;
 	public static int PG_DOWN = KeyEvent.VK_PAGE_DOWN;
+	public static int INSERT = KeyEvent.VK_INSERT;
 
 	private static Frame f;
 
