@@ -4,6 +4,25 @@ public class Render {
 
 	private static boolean defaultTrans, shouldTrans = false;
 
+	// The main render method for everything, this is what puts things on the
+	// screen.
+	//
+	// T is the texture that gets drawn on the screen
+	//
+	// xPos and yPos are the top left coordinates of where the texture will be
+	// drawn
+	//
+	// xStart and yStart change where the render method starts scanning the
+	// texture, essentially offsets for start points
+	//
+	// xStop and yStop change where the method stops scanning the texture
+	//
+	// Exclude hex is the color that doesn't get rendered, that one color
+	// becomes transparent essentially
+	//
+	// Flip changes how the image is rendered, it will flip the image
+	// 0 is normal, 1 is flipped around the y axis, 2 is flipped around the x
+	// axis, 3 is both
 	public static void render(Frame f, Texture t, int xPos, int yPos, int xStart, int yStart, int xStop, int yStop, int excludeHex, int flip) {
 		if (yStart <= 0) {
 			yStart = 0;
@@ -34,27 +53,48 @@ public class Render {
 		}
 	}
 
+	// Returns the status of transparency rendering
 	public static boolean isRenderingTransparency() {
 		return shouldTrans;
 	}
 
+	// Enables all transparency for everything
 	public static void enableTransparency(boolean shouldRender) {
 		defaultTrans = shouldRender;
 	}
 
+	// Enables or disables transparency after global transparency options are
+	// set
+	// Useful to enable transparency for just one render call and then disable
+	// it
 	public static void shouldRenderTransparency(boolean bool) {
 		shouldTrans = bool;
 	}
 
+	// Simplest way to render a texture, draws full texture (t) at xPos and yPos
+	// on the screen.
+	// Still a simple method, just a few more options on how it should be
+	// rendered
+	//
+	// Exclude hex gets removed from the texture when it renders, becomes
+	// transparent
+	//
+	// Flip flips the image, 0 is normal, 1 is flipped around the y axis, 2 is
+	// flipped around the x axis, 3 is both
 	public static void simpleRender(Frame f, Texture t, int xPos, int yPos, int excludeHex, int flip) {
 		render(f, t, xPos, yPos, 0, 0, t.getWidth(), t.getHeight(), excludeHex, flip);
 	}
 
+	// Simplest way to render a texture, draws full texture (t) at xPos and yPos
+	// on the screen.
 	public static void simpleRender(Frame f, Texture t, int xPos, int yPos) {
 		render(f, t, xPos, yPos, 0, 0, t.getWidth(), t.getHeight(), -1, 0);
 	}
 
-	public static int blendF(int oldHex, int newHex, double ratio) {
+	// Blends two hexadecimal colors, hex1 and hex2, together, and the amount of
+	// each in the final result is determined by the float ratio. Ex: 0.6f = 40%
+	// hex1, 60% hex2
+	public static int blendF(int hex1, int hex2, double ratio) {
 		if (ratio > 1f) {
 			ratio = 1f;
 		} else if (ratio < 0f) {
@@ -62,15 +102,15 @@ public class Render {
 		}
 		double invRatio = 1.0f - ratio;
 
-		int a1 = (oldHex >> 24 & 0xff);
-		int r1 = ((oldHex & 0xff0000) >> 16);
-		int g1 = ((oldHex & 0xff00) >> 8);
-		int b1 = (oldHex & 0xff);
+		int a1 = (hex1 >> 24 & 0xff);
+		int r1 = ((hex1 & 0xff0000) >> 16);
+		int g1 = ((hex1 & 0xff00) >> 8);
+		int b1 = (hex1 & 0xff);
 
-		int a2 = (newHex >> 24 & 0xff);
-		int r2 = ((newHex & 0xff0000) >> 16);
-		int g2 = ((newHex & 0xff00) >> 8);
-		int b2 = (newHex & 0xff);
+		int a2 = (hex2 >> 24 & 0xff);
+		int r2 = ((hex2 & 0xff0000) >> 16);
+		int g2 = ((hex2 & 0xff00) >> 8);
+		int b2 = (hex2 & 0xff);
 
 		int alpha = (int) ((a1 * invRatio) + (a2 * ratio));
 		int red = (int) ((r1 * invRatio) + (r2 * ratio));
@@ -80,9 +120,11 @@ public class Render {
 		return alpha << 24 | red << 16 | green << 8 | blue;
 	}
 
-	public static int blend(int top, int bottom) {
-		float amt = (top >> 24 & 0xff) / 256f;
-		return blendF(bottom, top, amt);
+	// Blends two hexadecimal colors, hex1 and hex2, together and returns one
+	// value
+	public static int blend(int hex1, int hex2) {
+		float amt = (hex1 >> 24 & 0xff) / 256f;
+		return blendF(hex2, hex1, amt);
 
 	}
 
@@ -129,48 +171,55 @@ public class Render {
 					setPixel(f, (int) (xPos + x + x), (int) (yPos + y + y), color);
 	}
 
+	// Draws a line from the x and y start points to the x and y stop points,
+	// color is the color of the line
 	public static void drawLine(Frame f, int xStart, int yStart, int xStop, int yStop, int color) {
-		int w = xStop - xStart;
-		int h = yStop - yStart;
-		int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-		if (w < 0)
-			dx1 = -1;
-		else if (w > 0)
-			dx1 = 1;
-		if (h < 0)
-			dy1 = -1;
-		else if (h > 0)
-			dy1 = 1;
-		if (w < 0)
-			dx2 = -1;
-		else if (w > 0)
-			dx2 = 1;
-		int longest = Math.abs(w);
-		int shortest = Math.abs(h);
-		if (!(longest > shortest)) {
-			longest = Math.abs(h);
-			shortest = Math.abs(w);
-			if (h < 0)
-				dy2 = -1;
-			else if (h > 0)
-				dy2 = 1;
-			dx2 = 0;
+		int width = xStop - xStart;
+		int height = yStop - yStart;
+		int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+		if (width < 0) {
+			x1 = -1;
+		} else if (width > 0) {
+			x1 = 1;
 		}
-		int numerator = longest >> 1;
+		if (height < 0) {
+			y1 = -1;
+		} else if (height > 0) {
+			y1 = 1;
+		}
+		if (width < 0) {
+			x2 = -1;
+		} else if (width > 0) {
+			x2 = 1;
+		}
+		int longest = Math.abs(width);
+		int shortest = Math.abs(height);
+		if (!(longest > shortest)) {
+			longest = Math.abs(height);
+			shortest = Math.abs(width);
+			if (height < 0)
+				y2 = -1;
+			else if (height > 0)
+				y2 = 1;
+			x2 = 0;
+		}
+		int num = longest >> 1;
 		for (int i = 0; i <= longest; i++) {
 			setPixel(f, xStart, yStart, color);
-			numerator += shortest;
-			if (!(numerator < longest)) {
-				numerator -= longest;
-				xStart += dx1;
-				yStart += dy1;
+			num += shortest;
+			if (!(num < longest)) {
+				num -= longest;
+				xStart += x1;
+				yStart += y1;
 			} else {
-				xStart += dx2;
-				yStart += dy2;
+				xStart += x2;
+				yStart += y2;
 			}
 		}
 	}
 
+	// Sets one individual pixel on a screen at x and y to the given hexadecimal
+	// color
 	public static void setPixel(Frame f, int x, int y, int color) {
 		int pixel = x + y * f.getScaledWidth();
 		if (x >= 0 && y >= 0 && y < f.getScaledHeight() && x < f.getScaledWidth() && pixel < f.pixelArray().length)
@@ -184,6 +233,8 @@ public class Render {
 			}
 	}
 
+	// Sets one individual pixel on the screen at x+y*width to the given
+	// hexadecimal color
 	public static void setPixel(Frame f, int pixel, int color) {
 		if (pixel >= 0 && pixel < f.pixelArray().length)
 			if (defaultTrans) {
@@ -194,6 +245,7 @@ public class Render {
 			}
 	}
 
+	// Returns the hexadecimal color of a given pixel
 	public static int getPixel(Frame f, int x, int y) {
 		int pixel = x + y * f.getScaledWidth();
 		if (x >= 0 && y >= 0 && y < f.getScaledHeight() && x < f.getScaledWidth() && pixel < f.pixelArray().length)
