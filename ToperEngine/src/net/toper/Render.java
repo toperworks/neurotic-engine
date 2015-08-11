@@ -167,10 +167,10 @@ public class Render {
 	public static void fillCircle(Frame f, int xPos, int yPos, int r, int color) {
 		for (float y = -r; y <= r; y += 0.5) {
 			int ya = (int) (yPos + y + y);
-			if (ya >= 0 && ya <= f.getHeight()) {
+			if (ya >= 0 && ya <= f.getScaledHeight()) {
 				for (float x = -r; x <= r; x += 0.5) {
 					int xa = (int) (xPos + x + x);
-					if (xa >= 0 && xa <= f.getWidth()) {
+					if (xa >= 0 && xa <= f.getScaledWidth()) {
 						if (x * x + y * y <= r * r + r * 0.8f) {
 							setPixel(f, xa, ya, color);
 						}
@@ -214,7 +214,8 @@ public class Render {
 		}
 		int num = longest >> 1;
 		for (int i = 0; i <= longest; i++) {
-			setPixel(f, xStart, yStart, color);
+			if (yStart >= 0 && yStart <= f.getScaledHeight() && xStart >= 0 && xStart <= f.getScaledWidth())
+				setPixel(f, xStart, yStart, color);
 			num += shortest;
 			if (!(num < longest)) {
 				num -= longest;
