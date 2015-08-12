@@ -26,7 +26,7 @@ public class Color {
 		this.a = colors[0];
 	}
 
-	public float[] decode(int hex) {
+	public static float[] decode(int hex) {
 		float colors[] = new float[4];
 		colors[0] = (((int) hex & 0xff) << 24);
 		colors[1] = (((int) hex & 0xff) << 16);
