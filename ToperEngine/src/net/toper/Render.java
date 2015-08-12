@@ -24,6 +24,7 @@ public class Render {
 	// 0 is normal, 1 is flipped around the y axis, 2 is flipped around the x
 	// axis, 3 is both
 	public static void render(Frame f, Texture t, int xPos, int yPos, int xStart, int yStart, int xStop, int yStop, int excludeHex, int flip) {
+		f.flagChange(xPos, yPos, xPos + xStop - xStart, yPos + yStop - yStart);
 		if (yStart <= 0) {
 			yStart = 0;
 		}
@@ -130,6 +131,7 @@ public class Render {
 
 	// Fills a rectangle, x and y are the top-left corner
 	public static void fillRect(Frame f, int xPos, int yPos, int width, int height, int color) {
+		f.flagChange(xPos, yPos, xPos + width, yPos + height);
 		for (int y = yPos; y < yPos + height; y++) {
 			for (int x = xPos; x < xPos + width; x++) {
 				if (y >= 0 && y <= f.getScaledHeight() && x >= 0 && x <= f.getScaledWidth())
@@ -140,6 +142,7 @@ public class Render {
 
 	// Draws the outline of a rectangle, x and y are the top-left corner
 	public static void drawRect(Frame f, int xPos, int yPos, int width, int height, int color) {
+		f.flagChange(xPos, yPos, xPos + width, yPos + height);
 		for (int y = yPos; y < yPos + height; y++) {
 			if (y >= 0 && y <= f.getScaledHeight())
 				setPixel(f, xPos, y, color);
@@ -160,13 +163,15 @@ public class Render {
 
 	// Draws an outline of a circle, x and y are the center, r is the radius
 	public static void drawCircle(Frame f, int xPos, int yPos, int radius, int color) {
+		f.flagChange(xPos - radius, yPos - radius, xPos + radius, yPos + radius);
+		radius = radius / 2;
 		for (float y = -radius; y <= radius; y += 0.5) {
 			int ya = (int) (yPos + y + y);
-			if (ya >= 0 && ya <= f.getScaledHeight()) {
+			if (ya >= 0 && ya < f.getScaledHeight()) {
 				for (float x = -radius; x <= radius; x += 0.5) {
 					int xa = (int) (xPos + x + x);
-					if (xa >= 0 && xa <= f.getScaledWidth()) {
-						if (x * x + y * y < radius * radius + radius * 0.8f && x * x + y * y > (radius * radius + radius * 0.8f) - radius) {
+					if (xa >= 0 && xa < f.getScaledWidth()) {
+						if (x * x + y * y <= radius * radius + radius * 0.8f && x * x + y * y >= (radius * radius + radius * 0.8f) - radius) {
 							setPixel(f, xa, ya, color);
 						}
 					}
@@ -177,12 +182,14 @@ public class Render {
 
 	// Fills a circular area, x and y are the center, and r is the radius
 	public static void fillCircle(Frame f, int xPos, int yPos, int radius, int color) {
+		f.flagChange(xPos - radius, yPos - radius, xPos + radius, yPos + radius);
+		radius = radius / 2;
 		for (float y = -radius; y <= radius; y += 0.5) {
 			int ya = (int) (yPos + y + y);
-			if (ya >= 0 && ya <= f.getScaledHeight()) {
+			if (ya >= 0 && ya < f.getScaledHeight()) {
 				for (float x = -radius; x <= radius; x += 0.5) {
 					int xa = (int) (xPos + x + x);
-					if (xa >= 0 && xa <= f.getScaledWidth()) {
+					if (xa >= 0 && xa < f.getScaledWidth()) {
 						if (x * x + y * y <= radius * radius + radius * 0.8f) {
 							setPixel(f, xa, ya, color);
 						}
@@ -195,6 +202,7 @@ public class Render {
 	// Draws a line from the x and y start points to the x and y stop points,
 	// color is the color of the line
 	public static void drawLine(Frame f, int xStart, int yStart, int xStop, int yStop, int color) {
+		f.flagChange(xStart, yStart, xStop, yStop);
 		int width = xStop - xStart;
 		int height = yStop - yStart;
 		int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
@@ -250,18 +258,6 @@ public class Render {
 					f.pixelArray()[pixel] = blend(color, getPixel(f, x, y));
 				else
 					f.pixelArray()[pixel] = color;
-			} else {
-				f.pixelArray()[pixel] = color;
-			}
-	}
-
-	// Sets one individual pixel on the screen at x+y*width to the given
-	// hexadecimal color
-	public static void setPixel(Frame f, int pixel, int color) {
-		if (pixel >= 0 && pixel < f.pixelArray().length)
-			if (defaultTrans) {
-				if (shouldTrans)
-					f.pixelArray()[pixel] = blend(color, f.pixelArray()[pixel]);
 			} else {
 				f.pixelArray()[pixel] = color;
 			}
