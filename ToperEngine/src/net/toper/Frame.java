@@ -3,11 +3,15 @@ package net.toper;
 import java.awt.Canvas;
 import java.awt.Cursor;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 
@@ -22,15 +26,14 @@ public class Frame {
 	protected int width = 0, height = 0, scale;
 	protected String title;
 	protected BufferedImage screen;
-	private int[] pixelArray;
-	private Graphics g;
+	private int[] pixelArray, screenPixels;
+	private Graphics2D g;
 	private BufferStrategy bs;
 
 	private boolean shouldFrameSleep = false;
 	private int sleepAmt;
 
 	boolean shouldRender = false;
-	int[] oldPixels;
 	private static float delta = 0;
 	private long lastTime = System.nanoTime();
 	private double nsPerTick = 1E9 / 60;
@@ -38,6 +41,11 @@ public class Frame {
 	private int frames = 0;
 	private int fps = 0;
 	private long timer = System.currentTimeMillis();
+
+	private int clearHex;
+
+	List<List<Integer>> oldChanges = new ArrayList<>();
+	List<List<Integer>> currentChanges = new ArrayList<>();
 
 	public Frame() {
 		if (scale <= 0)
@@ -61,7 +69,8 @@ public class Frame {
 		if (this.scale != scale) {
 			this.scale = scale;
 			screen = new BufferedImage(width / scale, height / scale, BufferedImage.TYPE_INT_RGB);
-			pixelArray = ((DataBufferInt) screen.getRaster().getDataBuffer()).getData();
+			screenPixels = ((DataBufferInt) screen.getRaster().getDataBuffer()).getData();
+			pixelArray = screenPixels;
 		}
 	}
 
@@ -84,11 +93,12 @@ public class Frame {
 			return;
 		}
 		screen = new BufferedImage(width / scale, height / scale, BufferedImage.TYPE_INT_RGB);
-		pixelArray = ((DataBufferInt) screen.getRaster().getDataBuffer()).getData();
+		screenPixels = ((DataBufferInt) screen.getRaster().getDataBuffer()).getData();
+
+		pixelArray = new int[getScaledWidth() * getScaledHeight()];
 		f = new JFrame();
 		c = new Canvas();
 		i = new Input(this);
-		oldPixels = new int[width * height];
 		f.setSize(width, height);
 		f.setTitle(title);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -102,19 +112,69 @@ public class Frame {
 		c.requestFocus();
 
 		c.createBufferStrategy(3);
+		bs = c.getBufferStrategy();
+		g = (Graphics2D) bs.getDrawGraphics();
+		flagChange(0, 0, width, height);
 	}
 
 	// Fills the array with the given hex to 'clear' it
 	public void clear(int hex) {
-		for (int i = 0; i < pixelArray.length; i++) {
-			pixelArray[i] = hex;
+		clearHex = hex;
+		for (int i = 0; i < oldChanges.size(); i++) {
+			List<Integer> numbers = oldChanges.get(i);
+			int xStart = numbers.get(0);
+			int yStart = numbers.get(1);
+			int xStop = numbers.get(2);
+			int yStop = numbers.get(3);
+			for (int y = yStart; y <= yStop; y++) {
+				if (y >= 0 && y < getScaledHeight()) {
+					for (int x = xStart; x <= xStop; x++) {
+						if (x >= 0 && x < getScaledWidth()) {
+							pixelArray[x + y * width] = clearHex;
+							screenPixels[x + y * width] = clearHex;
+						}
+					}
+				}
+			}
+		}
+		oldChanges.clear();
+	}
+
+	public void enableAntiAlias(boolean enable) {
+		if (enable) {
+			g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		}
 	}
 
 	// Draws image to the buffer, call endFrame() to show it
 	private void update() {
+
+		for (int i = 0; i < currentChanges.size(); i++) {
+			List<Integer> numbers = (List<Integer>) currentChanges.get(i);
+			int xStart = numbers.get(0);
+			int yStart = numbers.get(1);
+			int xStop = numbers.get(2);
+			int yStop = numbers.get(3);
+			for (int y = yStart; y <= yStop; y++) {
+				if (y >= 0 && y < getScaledHeight()) {
+					for (int x = xStart; x <= xStop; x++) {
+						if (x >= 0 && x < getScaledWidth()) {
+							int pixel = pixelArray[x + y * getScaledWidth()];
+							float amt = (pixel >> 24 & 0xff) / 255f;
+							if (amt > (0x00000000 >> 24 & 0xff) / 255f) {
+								screenPixels[x + y * getScaledWidth()] = pixel;
+							}
+						}
+					}
+				}
+			}
+			oldChanges.add(i, numbers);
+		}
+		currentChanges.clear();
 		bs = c.getBufferStrategy();
-		g = bs.getDrawGraphics();
+		g = (Graphics2D) bs.getDrawGraphics();
 		g.drawImage(screen, 0, 0, getWidth(), getHeight(), null);
 	}
 
@@ -198,6 +258,15 @@ public class Frame {
 
 	public int[] pixelArray() {
 		return pixelArray;
+	}
+
+	public void flagChange(int xPos, int yPos, int xStop, int yStop) {
+		List<Integer> pos = new ArrayList<Integer>();
+		pos.add(xPos);
+		pos.add(yPos);
+		pos.add(xStop);
+		pos.add(yStop);
+		currentChanges.add(pos);
 	}
 
 }
