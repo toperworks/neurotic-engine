@@ -101,7 +101,7 @@ public class Frame {
 		f.setVisible(true);
 		c.requestFocus();
 
-		c.createBufferStrategy(3);
+		c.createBufferStrategy(2);
 	}
 
 	// Fills the array with the given hex to 'clear' it
@@ -121,8 +121,8 @@ public class Frame {
 	// Shows the completed frame on the screen
 	public void endFrame() {
 		update();
-		bs.show();
 		g.dispose();
+		bs.show();
 		frames++;
 
 		if (System.currentTimeMillis() - timer >= 1000) {
