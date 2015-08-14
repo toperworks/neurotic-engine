@@ -4,12 +4,12 @@ import java.awt.Canvas;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -42,8 +42,8 @@ public class Frame {
 	private long timer = System.currentTimeMillis();
 
 	private int clearHex;
-
-	List<List<Integer>> oldChanges = new ArrayList<>();
+	boolean showFrameUpdates = false;
+	List<List<Integer>> previousChanges = new ArrayList<>();
 	List<List<Integer>> currentChanges = new ArrayList<>();
 
 	public Frame() {
@@ -84,6 +84,10 @@ public class Frame {
 		this.height = height;
 	}
 
+	public void showFrameUpdates(boolean show) {
+		showFrameUpdates = show;
+	}
+
 	// Opens the window
 	public void open() {
 		System.out.println(ENGINE_VERSION);
@@ -119,8 +123,8 @@ public class Frame {
 	// Fills the array with the given hex to 'clear' it
 	public void clear(int hex) {
 		clearHex = hex;
-		for (int i = 0; i < oldChanges.size(); i++) {
-			List<Integer> numbers = oldChanges.get(i);
+		for (int i = 0; i < previousChanges.size(); i++) {
+			List<Integer> numbers = previousChanges.get(i);
 			int xStart = numbers.get(0);
 			int yStart = numbers.get(1);
 			int xStop = numbers.get(2);
@@ -136,26 +140,36 @@ public class Frame {
 				}
 			}
 		}
-		oldChanges.clear();
 	}
 
-	public void enableAntiAlias(boolean enable) {
-		if (enable) {
-			g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
-			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-			g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	private boolean equalLists(List<Integer> one, List<Integer> two) {
+		if (one == null && two == null) {
+			return true;
 		}
+
+		if ((one == null && two != null) || one != null && two == null || one.size() != two.size()) {
+			return false;
+		}
+
+		// to avoid messing the order of the lists we will use a copy
+		// as noted in comments by A. R. S.
+		one = new ArrayList<Integer>(one);
+		two = new ArrayList<Integer>(two);
+
+		Collections.sort(one);
+		Collections.sort(two);
+		return one.equals(two);
 	}
 
 	// Draws image to the buffer, call endFrame() to show it
 	private void update() {
-
+		previousChanges.clear();
 		for (int i = 0; i < currentChanges.size(); i++) {
-			List<Integer> numbers = (List<Integer>) currentChanges.get(i);
-			int xStart = numbers.get(0);
-			int yStart = numbers.get(1);
-			int xStop = numbers.get(2);
-			int yStop = numbers.get(3);
+			List<Integer> data = (List<Integer>) currentChanges.get(i);
+			int xStart = data.get(0);
+			int yStart = data.get(1);
+			int xStop = data.get(2);
+			int yStop = data.get(3);
 			for (int y = yStart; y <= yStop; y++) {
 				if (y >= 0 && y < getScaledHeight()) {
 					for (int x = xStart; x <= xStop; x++) {
@@ -163,15 +177,17 @@ public class Frame {
 							int pixel = pixelArray[x + y * getScaledWidth()];
 							float amt = (pixel >> 24 & 0xff) / 255f;
 							if (amt > (0x00000000 >> 24 & 0xff) / 255f) {
+								if (showFrameUpdates) {
+									pixel += 0xff666666;
+								}
 								screenPixels[x + y * getScaledWidth()] = pixel;
 							}
 						}
 					}
 				}
 			}
-			oldChanges.add(i, numbers);
+			previousChanges.add(data);
 		}
-		currentChanges.clear();
 		bs = c.getBufferStrategy();
 		g = (Graphics2D) bs.getDrawGraphics();
 		g.drawImage(screen, 0, 0, getWidth(), getHeight(), null);
@@ -199,6 +215,7 @@ public class Frame {
 		now = System.nanoTime();
 		delta = (float) ((now - lastTime) / nsPerTick);
 		lastTime = now;
+		currentChanges.clear();
 	}
 
 	// Sets the amount the CPU should wait to catch up, helps with CPU usage
@@ -265,7 +282,18 @@ public class Frame {
 		pos.add(yPos);
 		pos.add(xStop);
 		pos.add(yStop);
-		currentChanges.add(pos);
+		boolean add = true;
+		for (int i = 0; i < previousChanges.size(); i++) {
+			List<Integer> old = previousChanges.get(i);
+			if (equalLists(old, pos)) {
+				previousChanges.add(pos);
+				add = false;
+				break;
+			}
+		}
+		if (add) {
+			currentChanges.add(pos);
+		}
 	}
 
 }
