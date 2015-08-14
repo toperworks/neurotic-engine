@@ -28,18 +28,18 @@ public class RenderEngine implements Runnable {
 
 	public void render() {
 		f.clear(0xfff);
-		renderLine();
-		renderCircle();
 		Render.simpleRender(f, t, 599, 599);
 		f.endFrame();
 	}
+
+	float i;
 
 	public void renderLine() {
 		Render.drawLine(f, 200, 200, 400, 400, 0XFF00FF00);
 	}
 
 	public void renderCircle() {
-		Render.fillCircle(f, 100, 100, 50, 0XFFFFFF00);
-		Render.drawCircle(f, 200, 100, 50, 0XFFFFFF00);
+		i += 0.05f;
+		Render.drawCircle(f, 200, 100, (int) i, 0XFFFFFF00);
 	}
 }
