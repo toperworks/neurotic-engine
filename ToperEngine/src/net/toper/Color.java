@@ -53,22 +53,18 @@ public class Color {
 
 	public void setRed(float red) {
 		r = red;
-
 	}
 
 	public void setBlue(float blue) {
 		b = blue;
-
 	}
 
 	public void setGreen(float green) {
 		g = green;
-
 	}
 
 	public void setAlpha(float alpha) {
 		a = alpha;
-
 	}
 
 }
