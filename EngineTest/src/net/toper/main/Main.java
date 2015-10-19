@@ -15,7 +15,7 @@ public class Main {
 
 	public void initFrame() {
 		f = new Frame();
-		f.setDimensions(1440, 1440 / 16 * 9);
+		f.setDimensions(1000, 1000 / 16 * 9);
 		f.open();
 	}
 
