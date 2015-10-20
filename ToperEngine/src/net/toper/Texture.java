@@ -118,6 +118,7 @@ public class Texture {
 	}
 
 	// Returns the exact unedited pixel color array
+
 	public int getOrigData(int index) {
 		if (index >= 0 && index < origPixelArray.length)
 			return origPixelArray[index];
@@ -157,7 +158,7 @@ public class Texture {
 			double radians = Math.toRadians(angle);
 			double cos = Math.cos(radians);
 			double sin = Math.sin(radians);
-			int[] pixels2 = new int[origPixelArray.length];
+			int[] pixels2 = new int[pixelArray.length];
 			int centerx = rotPointX;
 			int centery = rotPointY;
 
@@ -169,7 +170,7 @@ public class Texture {
 					int k = (int) (((n * cos - m * sin) + centery));
 					int pix = (y * width + x);
 					if (pix < pixels2.length && j >= 0 && j < width && k >= 0 && k < height) {
-						pixels2[pix] = getOrigData((int) (j), (int) (k));
+						pixels2[pix] = getData((int) (j), (int) (k));
 					} else if (pix < pixels2.length) {
 						pixels2[pix] = nullHex;
 					}
@@ -231,7 +232,7 @@ public class Texture {
 			this.yScale = yScale;
 			width = (int) (origWidth * xScale);
 			height = (int) (origHeight * yScale);
-			int pixels[] = new int[(int) ((origWidth * xScale) * (origHeight * yScale))];
+			int pixels[] = new int[(int) (width * height)];
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
 					int index = (x + y * (int) (width));

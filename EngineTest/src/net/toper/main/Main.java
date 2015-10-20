@@ -1,12 +1,13 @@
 package net.toper.main;
 
 import net.toper.Frame;
+import net.toper.graphics.Generate;
 import net.toper.graphics.RenderEngine;
 
 public class Main {
 
 	Frame f;
-
+	
 	public Main() {
 		initFrame();
 		Thread t = new Thread(new RenderEngine(f));

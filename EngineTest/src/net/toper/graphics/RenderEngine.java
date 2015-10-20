@@ -8,12 +8,14 @@ import net.toper.Texture;
 public class RenderEngine implements Runnable {
 
 	private Frame f;
-	public static Texture textureSheet;
-	public static Texture grass;
+
+	public static Texture textureSheet = ResourceManager.loadTexture("/tiles.png", true);
+	public static Texture grass = ResourceManager.getTexFromSheet(textureSheet, 0, 0, 16, 16);
+	public static Texture water = ResourceManager.getTexFromSheet(textureSheet, 17, 0, 16, 16);
+
+	Generate level = new Generate(10);
 
 	public RenderEngine(Frame f) {
-		textureSheet = ResourceManager.loadTexture("/tiles.png", true);
-		grass = ResourceManager.getTexFromSheet(textureSheet, 0, 0, 16, 16);
 		this.f = f;
 	}
 
@@ -22,6 +24,8 @@ public class RenderEngine implements Runnable {
 	}
 
 	public void run() {
+		grass.setScale(Generate.TILE_SIZE / grass.getWidth());
+		water.setScale(Generate.TILE_SIZE / water.getWidth());
 		while (true) {
 			f.setTitle("FPS: " + f.getFPS());
 			render();
@@ -32,6 +36,7 @@ public class RenderEngine implements Runnable {
 
 	public void render() {
 		f.clear(0xfff);
+		level.render(f);
 		f.endFrame();
 	}
 

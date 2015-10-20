@@ -80,7 +80,8 @@ public class Frame {
 	public void open() {
 		System.out.println(ENGINE_VERSION);
 		if (width == 0 || height == 0) {
-			System.out.println("Cannot create frame, use setDimensions(width,height) to set dimensions. Cannot be zero.");
+			System.out
+					.println("Cannot create frame, use setDimensions(width,height) to set dimensions. Cannot be zero.");
 			return;
 		}
 		screen = new BufferedImage(width / scale, height / scale, BufferedImage.TYPE_INT_RGB);
@@ -104,11 +105,24 @@ public class Frame {
 		c.createBufferStrategy(2);
 	}
 
+	private boolean isFrameChanged = true;
+	int pixelArrayCopy[];
+
 	// Fills the array with the given hex to 'clear' it
 	public void clear(int hex) {
+		isFrameChanged = false;
+		if (pixelArrayCopy == null) {
+			pixelArrayCopy = new int[pixelArray.length];
+			System.arraycopy(pixelArray, 0, pixelArrayCopy, 0, pixelArray.length);
+			isFrameChanged = true;
+		}
 		for (int i = 0; i < pixelArray.length; i++) {
+			if (pixelArray[i] != pixelArrayCopy[i]) {
+				isFrameChanged = true;
+			}
 			pixelArray[i] = hex;
 		}
+		System.arraycopy(pixelArray, 0, pixelArrayCopy, 0, pixelArray.length);
 	}
 
 	// Draws image to the buffer, call endFrame() to show it
@@ -120,9 +134,11 @@ public class Frame {
 
 	// Shows the completed frame on the screen
 	public void endFrame() {
-		update();
-		g.dispose();
-		bs.show();
+		if (isFrameChanged) {
+			update();
+			g.dispose();
+			bs.show();
+		}
 		frames++;
 
 		if (System.currentTimeMillis() - timer >= 1000) {
