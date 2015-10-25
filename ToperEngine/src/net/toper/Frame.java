@@ -28,6 +28,7 @@ public class Frame {
 
 	private boolean shouldFrameSleep = false;
 	private int sleepAmt;
+	private static boolean vsync = false;
 
 	boolean shouldRender = false;
 	int[] oldPixels;
@@ -60,14 +61,18 @@ public class Frame {
 			scale = 1;
 		if (this.scale != scale) {
 			this.scale = scale;
-			screen = new BufferedImage(width / scale, height / scale, BufferedImage.TYPE_INT_RGB);
-			pixelArray = ((DataBufferInt) screen.getRaster().getDataBuffer()).getData();
+			screen = new BufferedImage(width / scale, height / scale,
+					BufferedImage.TYPE_INT_RGB);
+			pixelArray = ((DataBufferInt) screen.getRaster().getDataBuffer())
+					.getData();
 		}
 	}
 
 	public void hideCursor() {
-		BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
-		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImg, new Point(0, 0), "blank cursor");
+		BufferedImage cursorImg = new BufferedImage(16, 16,
+				BufferedImage.TYPE_INT_ARGB);
+		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+				cursorImg, new Point(0, 0), "blank cursor");
 		f.getContentPane().setCursor(blankCursor);
 	}
 
@@ -84,8 +89,10 @@ public class Frame {
 					.println("Cannot create frame, use setDimensions(width,height) to set dimensions. Cannot be zero.");
 			return;
 		}
-		screen = new BufferedImage(width / scale, height / scale, BufferedImage.TYPE_INT_RGB);
-		pixelArray = ((DataBufferInt) screen.getRaster().getDataBuffer()).getData();
+		screen = new BufferedImage(width / scale, height / scale,
+				BufferedImage.TYPE_INT_RGB);
+		pixelArray = ((DataBufferInt) screen.getRaster().getDataBuffer())
+				.getData();
 		f = new JFrame();
 		c = new Canvas();
 		i = new Input(this);
@@ -113,7 +120,8 @@ public class Frame {
 		isFrameChanged = false;
 		if (pixelArrayCopy == null) {
 			pixelArrayCopy = new int[pixelArray.length];
-			System.arraycopy(pixelArray, 0, pixelArrayCopy, 0, pixelArray.length);
+			System.arraycopy(pixelArray, 0, pixelArrayCopy, 0,
+					pixelArray.length);
 			isFrameChanged = true;
 		}
 		for (int i = 0; i < pixelArray.length; i++) {
@@ -214,6 +222,13 @@ public class Frame {
 
 	public int[] pixelArray() {
 		return pixelArray;
+	}
+
+	public static void enableVSync(Frame f, boolean enable) {
+		if (enable) {
+			new VSync(f);
+		}
+		vsync = enable;
 	}
 
 }
