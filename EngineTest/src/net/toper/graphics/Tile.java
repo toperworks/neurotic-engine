@@ -16,8 +16,11 @@ public class Tile {
 	}
 
 	public void render(Frame f, int xOff, int yOff) {
-		Render.render(f, tex, (x * Generate.TILE_SIZE) - xOff, (y * Generate.TILE_SIZE) - yOff, 0, 0, tex.getScaledWidth(),
-				tex.getScaledHeight(), 0xffff00ff, 0);
+		Render.render(f, tex, (x * Generate.TILE_SIZE) - xOff, (y * Generate.TILE_SIZE) - yOff,
+				-(x * Generate.TILE_SIZE) + xOff - Generate.TILE_SIZE,
+				-(y * Generate.TILE_SIZE) + yOff - Generate.TILE_SIZE,
+				-(x * Generate.TILE_SIZE) + xOff + f.getScaledWidth() + Generate.TILE_SIZE,
+				-(y * Generate.TILE_SIZE) + yOff + f.getScaledHeight() + Generate.TILE_SIZE, 0xffffFFFF, 0);
 	}
 
 }

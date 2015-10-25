@@ -55,9 +55,11 @@ public class ResourceManager {
 
 	public static Texture getTexFromSheet(Texture sheet, int startX, int startY, int width, int height) {
 		Texture tempTex = new Texture(width, height);
-		for (int y = 0; y < height && y + startY < sheet.getHeight(); y++) {
-			for (int x = 0; x < width && x + startX < sheet.getWidth(); x++) {
-				tempTex.setData(x + y * width, sheet.getData(x + startX, y + startY));
+		for (int y = startY; y < height + startY && y < sheet.getHeight()
+				&& y + height + startY < sheet.getHeight(); y++) {
+			for (int x = startX; x < width + startX && x < sheet.getWidth()
+					&& x + width + startX < sheet.getWidth(); x++) {
+				tempTex.setData((x - startX) + (y - startY) * width, sheet.getData(x, y));
 			}
 		}
 		tempTex.clampData();
@@ -83,10 +85,10 @@ public class ResourceManager {
 	}
 
 	public static Texture loadTexture(BufferedImage temp, int startX, int startY, int stopX, int stopY) {
-		Texture tempTex = new Texture(temp.getWidth(), temp.getHeight());
-		for (int y = startY; y < stopY && y < tempTex.getHeight(); y++) {
-			for (int x = startX; x < stopX && x < tempTex.getWidth(); x++) {
-				tempTex.setData(x + y * temp.getWidth(), temp.getRGB(x, y));
+		Texture tempTex = new Texture(stopX - startX, stopY - startY);
+		for (int y = 0; y < stopY - startY + 1 && y < tempTex.getHeight(); y++) {
+			for (int x = 0; x < stopX - startX + 1 && x < tempTex.getWidth(); x++) {
+				tempTex.setData((x + startX) + (y + startY) * temp.getWidth(), temp.getRGB(x, y));
 			}
 		}
 		tempTex.clampData();
