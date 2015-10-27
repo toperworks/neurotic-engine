@@ -4,6 +4,7 @@ public class Polygon {
 	public int x, y, width, height;
 	public int colorHex;
 	private Vector[] points = new Vector[0];
+	private int[] contains;
 
 	public Polygon() {
 	}
@@ -57,17 +58,30 @@ public class Polygon {
 		}
 		this.width = width;
 		this.height = height;
+
+		contains = new int[(x + width) * (y + height)];
+
+		for (int ya = y; ya < y + height; ya++) {
+			for (int xa = x; xa < x + width; xa++) {
+				boolean inside = false;
+				for (int i = 0, a = points.length - 1; i < points.length; a = i++) {
+					if ((points[i].y > ya) != (points[a].y > ya)
+							&& (xa < (points[a].x - points[i].x) * (ya - points[i].y) / (points[a].y - points[i].y)
+									+ points[i].x)) {
+						inside = !inside;
+					}
+				}
+				if (inside)
+					contains[xa + ya * width] = 1;
+			}
+		}
 	}
 
 	public boolean pointInPolygon(int x, int y) {
-		boolean inside = false;
-		for (int i = 0, a = points.length - 1; i < points.length; a = i++) {
-			if ((points[i].y > y) != (points[a].y > y)
-					&& (x < (points[a].x - points[i].x) * (y - points[i].y) / (points[a].y - points[i].y)
-							+ points[i].x)) {
-				inside = !inside;
-			}
-		}
-		return inside;
+		int index = x + y * width;
+		if (index >= 0 && index < contains.length)
+			return contains[index] == 1;
+		else
+			return false;
 	}
 }
