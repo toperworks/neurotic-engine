@@ -1,11 +1,12 @@
 package net.toper.main;
 
+
 import net.toper.Frame;
 import net.toper.graphics.RenderEngine;
 
 public class Main {
 
-	Frame f;
+	static Frame f;
 
 	public Main() {
 		initFrame();
@@ -15,7 +16,7 @@ public class Main {
 
 	public void initFrame() {
 		f = new Frame();
-		f.setDimensions(1240, 1240 / 16 * 9);
+		f.setDimensions(900, 900 / 16 * 9);
 		f.open();
 	}
 

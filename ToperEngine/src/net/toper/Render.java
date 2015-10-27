@@ -1,5 +1,7 @@
 package net.toper;
 
+import net.toper.shape.Polygon;
+
 public class Render {
 
 	private static boolean defaultTrans, shouldTrans = false;
@@ -23,7 +25,8 @@ public class Render {
 	// Flip changes how the image is rendered, it will flip the image
 	// 0 is normal, 1 is flipped around the y axis, 2 is flipped around the x
 	// axis, 3 is both
-	public static void render(Frame f, Texture t, int xPos, int yPos, int xStart, int yStart, int xStop, int yStop, int excludeHex, int flip) {
+	public static void render(Frame f, Texture t, int xPos, int yPos, int xStart, int yStart, int xStop, int yStop,
+			int excludeHex, int flip) {
 		if (yStart <= 0) {
 			yStart = 0;
 		}
@@ -50,6 +53,16 @@ public class Render {
 						}
 					}
 				}
+		}
+	}
+
+	public static void simplePolyDraw(Frame f, Polygon p) {
+		for (int y = p.y; y < p.y + p.height && y >= 0 && y < f.getScaledHeight(); y++) {
+			for (int x = p.x; x < p.x + p.width && x >= 0 && x < f.getScaledWidth(); x++) {
+				if (p.pointInPolygon(x, y)) {
+					Render.setPixel(f, x, y, p.getColor());
+				}
+			}
 		}
 	}
 
@@ -166,7 +179,8 @@ public class Render {
 				for (float x = -radius; x <= radius; x += 0.5) {
 					int xa = (int) (xPos + x + x);
 					if (xa >= 0 && xa <= f.getScaledWidth()) {
-						if (x * x + y * y < radius * radius + radius * 0.8f && x * x + y * y > (radius * radius + radius * 0.8f) - radius) {
+						if (x * x + y * y < radius * radius + radius * 0.8f
+								&& x * x + y * y > (radius * radius + radius * 0.8f) - radius) {
 							setPixel(f, xa, ya, color);
 						}
 					}
