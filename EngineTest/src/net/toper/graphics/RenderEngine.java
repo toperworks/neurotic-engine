@@ -18,35 +18,35 @@ public class RenderEngine implements Runnable {
 		return f;
 	}
 
-	Polygon p;
-
 	public void run() {
 		p = new Polygon();
+		p.setColor(0xffffff00);
+		p.addVertex(new Vector(400, 300));
+		p.addVertex(new Vector(650, 500));
+		p.addVertex(new Vector(400, 150));
+		p.addVertex(new Vector(100, 250));
+		p.addVertex(new Vector(300, 50));
+		p.addVertex(new Vector(200, 250));
+		p.addVertex(new Vector(150, 150));
+		p.addVertex(new Vector(105, 350));
 		while (true) {
-			System.out.println(f.getFPS());
 			render();
 		}
 	}
 
 	float i;
 	int fps;
+	Polygon p;
 
 	public void render() {
-		p.setColor(0xfffffff);
 		f.clear(0x000);
+		p.rotateAround(0.1f * f.getDelta());
 		drawShape();
 		f.endFrame();
+		f.setTitle("" + f.getFPS());
 	}
 
-	boolean down1 = false;
-
 	public void drawShape() {
-		if (Input.getMouseButton() == 1 && !down1) {
-			p.addVertex(new Vector(Input.getActualMouseX(), Input.getActualMouseY()));
-			down1 = true;
-		} else if (down1) {
-			down1 = false;
-		}
 		Render.simplePolyDraw(f, p);
 	}
 
