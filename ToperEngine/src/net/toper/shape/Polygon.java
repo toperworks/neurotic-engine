@@ -5,6 +5,7 @@ public class Polygon {
 	public int colorHex;
 	private Vector[] points = new Vector[0];
 	private int[] contains;
+	private Vector center;
 
 	public Polygon() {
 	}
@@ -47,6 +48,8 @@ public class Polygon {
 			origY = y;
 			origWidth = width;
 			origHeight = height;
+			center = new Vector((origX + (origWidth / 2)), (origY + (origHeight / 2)));
+
 		}
 		generateContainsArray();
 	}
@@ -107,26 +110,43 @@ public class Polygon {
 		return height;
 	}
 
-	public void rotateAround(double angle) {
-		Vector center = new Vector((origX + (origWidth / 2)), (origY + (origHeight / 2)));
-		angle = Math.toRadians(angle);
-		double sin = Math.sin(angle);
-		double cos = Math.cos(angle);
-		for (int i = 0; i < points.length; i++) {
-			points[i].x -= center.x;
-			points[i].y -= center.y;
+	private double angle;
 
-			double newX = points[i].x * cos - points[i].y * sin;
-			double newY = points[i].x * sin + points[i].y * cos;
+	public void rotateAround(double changeAngle) {
+		if (this.angle != changeAngle) {
+			double angle = changeAngle - this.angle;
+			angle = Math.toRadians(angle);
+			double sin = Math.sin(angle);
+			double cos = Math.cos(angle);
+			for (int i = 0; i < points.length; i++) {
+				points[i].x -= center.x;
+				points[i].y -= center.y;
 
-			float tempX = (float) (newX + center.x);
-			float tempY = (float) (newY + center.y);
-			changeVertex(i, new Vector(tempX, tempY));
+				double newX = points[i].x * cos - points[i].y * sin;
+				double newY = points[i].x * sin + points[i].y * cos;
+
+				float tempX = (float) (newX + center.x);
+				float tempY = (float) (newY + center.y);
+				changeVertex(i, new Vector(tempX, tempY));
+			}
+			checkDimensions(false);
+			this.angle = changeAngle;
 		}
-		checkDimensions(false);
 	}
 
 	public String toString() {
 		return "Point { X = " + x + ", Y = " + y + " }";
+	}
+
+	public int getCenterX() {
+		return (int) center.x;
+	}
+
+	public int getCenterY() {
+		return (int) center.y;
+	}
+
+	public double getRotAngle() {
+		return angle;
 	}
 }

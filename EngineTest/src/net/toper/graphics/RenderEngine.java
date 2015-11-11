@@ -20,15 +20,10 @@ public class RenderEngine implements Runnable {
 
 	public void run() {
 		p = new Polygon();
-		p.setColor(0xffffff00);
-		p.addVertex(new Vector(400, 300));
-		p.addVertex(new Vector(650, 500));
-		p.addVertex(new Vector(400, 150));
-		p.addVertex(new Vector(100, 250));
-		p.addVertex(new Vector(300, 50));
-		p.addVertex(new Vector(200, 250));
-		p.addVertex(new Vector(150, 150));
-		p.addVertex(new Vector(105, 350));
+		p.addVertex(new Vector(100, 10));
+		p.addVertex(new Vector(250, 150));
+		p.addVertex(new Vector(100, 50));
+		p.addVertex(new Vector(250, 10));
 		while (true) {
 			render();
 		}
@@ -39,8 +34,11 @@ public class RenderEngine implements Runnable {
 	Polygon p;
 
 	public void render() {
+		Render.enableTransparency(false);
 		f.clear(0x000);
-		p.rotateAround(0.1f * f.getDelta());
+		double degrees = getAngle(Input.getScaledMouseX(), Input.getScaledMouseY());
+		p.rotateAround(degrees);
+		p.setColor(0xccffff00);
 		drawShape();
 		f.endFrame();
 		f.setTitle("" + f.getFPS());
@@ -48,6 +46,15 @@ public class RenderEngine implements Runnable {
 
 	public void drawShape() {
 		Render.simplePolyDraw(f, p);
+	}
+
+	public float getAngle(int x, int y) {
+		float angle = (float) Math.toDegrees(Math.atan2(p.getCenterY() - y, p.getCenterX() - x));
+
+		if (angle < 0) {
+			angle += 360;
+		}
+		return angle;
 	}
 
 }
