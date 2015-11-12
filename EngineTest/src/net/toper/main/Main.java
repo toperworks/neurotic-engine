@@ -1,6 +1,5 @@
 package net.toper.main;
 
-
 import net.toper.Frame;
 import net.toper.graphics.RenderEngine;
 
@@ -10,14 +9,13 @@ public class Main {
 
 	public Main() {
 		initFrame();
-		Thread t = new Thread(new RenderEngine(f));
-		t.start();
+		new RenderEngine(f);
 	}
 
 	public void initFrame() {
 		f = new Frame();
 		f.setDimensions(1200, 1200 / 16 * 9);
-		f.changeScale(3);
+		f.changeScale(0);
 		f.open();
 	}
 

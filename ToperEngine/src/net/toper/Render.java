@@ -58,11 +58,13 @@ public class Render {
 
 	public static void simplePolyDraw(Frame f, Polygon p) {
 		for (int y = p.y; y < p.y + p.height; y++) {
-			for (int x = p.x; x < p.x + p.width; x++) {
-				if (p.pointInPolygon(x, y)) {
-					Render.setPixel(f, x, y, p.getColor());
+			if (y >= 0 && y <= f.getScaledHeight())
+				for (int x = p.x; x < p.x + p.width; x++) {
+					if (x >= 0 && x <= f.getScaledWidth())
+						if (p.pointInPolygon(x, y)) {
+							Render.setPixel(f, x, y, p.getColor());
+						}
 				}
-			}
 		}
 	}
 
