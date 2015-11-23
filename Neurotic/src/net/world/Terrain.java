@@ -3,6 +3,8 @@ package net.world;
 import net.render.Loader;
 import net.render.models.RawModel;
 import net.render.textures.ModelTexture;
+import net.render.textures.TerrainTexture;
+import net.render.textures.TerrainTexturePack;
 
 public class Terrain {
 
@@ -12,10 +14,12 @@ public class Terrain {
 	private float x;
 	private float z;
 	private RawModel model;
-	private ModelTexture texture;
+	private TerrainTexturePack texturePack;
+	private TerrainTexture blendMap;
 
-	public Terrain(int gridX, int gridZ, Loader load, ModelTexture texture) {
-		this.texture = texture;
+	public Terrain(int gridX, int gridZ, Loader load, TerrainTexturePack texturePack, TerrainTexture blend) {
+		this.texturePack = texturePack;
+		this.blendMap = blend;
 		this.x = gridX * SIZE;
 		this.z = gridZ * SIZE;
 		this.model = generateTerrain(load);
@@ -45,12 +49,12 @@ public class Terrain {
 		this.model = model;
 	}
 
-	public ModelTexture getTexture() {
-		return texture;
+	public TerrainTexturePack getTexturePack() {
+		return texturePack;
 	}
 
-	public void setTexture(ModelTexture texture) {
-		this.texture = texture;
+	public TerrainTexture getBlendMap() {
+		return blendMap;
 	}
 
 	private RawModel generateTerrain(Loader loader) {

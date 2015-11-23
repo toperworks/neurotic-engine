@@ -48,7 +48,7 @@ public class RenderEntity {
 			MasterRenderer.disableCulling();
 		shader.loadFakeLightingVariable(model.getTex().hasTransparency());
 		shader.loadShineVariables(model.getTex().getShineDamper(), model.getTex().getReflectivity());
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL13.glActiveTexture(GL11.GL_TEXTURE);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTex().getID());
 
 	}

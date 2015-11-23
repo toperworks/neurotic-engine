@@ -17,11 +17,12 @@ public class DisplayManager {
 
 	/** frames per second */
 	static int fps;
+	private static float delta;
 	/** last fps time */
 	static long lastFPS;
 
 	public static void createDisplay() {
-		lastFPS = getTime(); 
+		lastFPS = getTime();
 		ContextAttribs att = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true);
 		try {
 			Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
@@ -36,23 +37,22 @@ public class DisplayManager {
 	public static void updateDisplay() {
 		updateFPS();
 		Display.update();
+		long time = getTime();
+		delta = (int) (time - lastFrame) / 1000f;
+		lastFrame = time;
 	}
 
 	public static void closeDisplay() {
 		Display.destroy();
 	}
 
-	public static int getDelta() {
-		long time = getTime();
-		int delta = (int) (time - lastFrame);
-		lastFrame = time;
-
+	public static float getDelta() {
 		return delta;
 	}
 
-	  public static long getTime() {
-	        return (Sys.getTime() * 1000) / Sys.getTimerResolution();
-	    }
+	public static long getTime() {
+		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
+	}
 
 	/**
 	 * Calculate the FPS and set it in the title bar
