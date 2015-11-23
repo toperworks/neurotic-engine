@@ -7,7 +7,7 @@ import net.render.Camera;
 
 public class Tools {
 
-	public static Matrix4f createTransfromationMatrix(Vector3f trans, float rx, float ry, float rz, float scale) {
+	public static Matrix4f createTransformationMatrix(Vector3f trans, float rx, float ry, float rz, float scale) {
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();
 		Matrix4f.translate(trans, matrix, matrix);
