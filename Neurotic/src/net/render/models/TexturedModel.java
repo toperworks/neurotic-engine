@@ -5,19 +5,27 @@ import net.render.textures.ModelTexture;
 public class TexturedModel {
 
 	private RawModel rawModel;
-	private ModelTexture tex;
+	private ModelTexture texture;
 
-	public TexturedModel(RawModel model, ModelTexture tex) {
+	public TexturedModel(RawModel model, ModelTexture texture) {
 		this.rawModel = model;
-		this.tex = tex;
+		this.texture = texture;
 	}
 
 	public RawModel getRawModel() {
 		return rawModel;
 	}
 
-	public ModelTexture getTex() {
-		return tex;
+	public void setRawModel(RawModel rawModel) {
+		this.rawModel = rawModel;
+	}
+
+	public ModelTexture getTexture() {
+		return texture;
+	}
+
+	public void setTexture(ModelTexture texture) {
+		this.texture = texture;
 	}
 
 }

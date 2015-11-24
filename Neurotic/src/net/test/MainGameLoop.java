@@ -43,17 +43,16 @@ public class MainGameLoop {
 		RawModel treeModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(),
 				data.getIndices());
 
-		TexturedModel staticModel = new TexturedModel(OBJLoader.loadOBJModel("tree", loader),
-				new ModelTexture(loader.loadTexture("tree")));
+		TexturedModel staticModel = new TexturedModel(treeModel, new ModelTexture(loader.loadTexture("tree")));
 
 		TexturedModel grass = new TexturedModel(OBJLoader.loadOBJModel("grassModel", loader),
 				new ModelTexture(loader.loadTexture("grassTexture")));
-		grass.getTex().setTransparency(true);
-		grass.getTex().setUseFakeLighting(true);
+		grass.getTexture().setTransparency(true);
+		grass.getTexture().setUseFakeLighting(true);
 		TexturedModel fern = new TexturedModel(OBJLoader.loadOBJModel("fern", loader),
 				new ModelTexture(loader.loadTexture("fern")));
-		fern.getTex().setTransparency(true);
-		grass.getTex().setUseFakeLighting(true);
+		fern.getTexture().setTransparency(true);
+		fern.getTexture().setUseFakeLighting(true);
 
 		List<Entity> entities = new ArrayList<Entity>();
 		Random random = new Random(676452);
@@ -69,9 +68,9 @@ public class MainGameLoop {
 			}
 		}
 
-		ModelTexture texture = staticModel.getTex();
+		ModelTexture texture = staticModel.getTexture();
 		texture.setShineDamper(10);
-		texture.setReflectivity(1);
+		texture.setReflectivity(2);
 
 		Light light = new Light(new Vector3f(3000, 2000, 3000), new Vector3f(1, 1, 1));
 
@@ -80,9 +79,10 @@ public class MainGameLoop {
 
 		Camera camera = new Camera();
 
-		RawModel bunnyModel = OBJLoader.loadOBJModel("bunny", loader);
-		TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("white")));
-		Player player = new Player(stanfordBunny, new Vector3f(100, 0, -50), 0, 0, 0, 1);
+		RawModel bunnyModel = OBJLoader.loadOBJModel("stall", loader);
+		TexturedModel stanfordBunny = new TexturedModel(bunnyModel,
+				new ModelTexture(loader.loadTexture("stallTexture")));
+		Player player = new Player(stanfordBunny, new Vector3f(0, 0, -50), 0, 0, 0, 1);
 
 		MasterRenderer renderer = new MasterRenderer();
 		while (!Display.isCloseRequested()) {
