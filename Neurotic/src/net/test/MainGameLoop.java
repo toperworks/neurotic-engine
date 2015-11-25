@@ -72,16 +72,15 @@ public class MainGameLoop {
 		texture.setShineDamper(10);
 		texture.setReflectivity(2);
 
-		Light light = new Light(new Vector3f(3000, 2000, 3000), new Vector3f(1, 1, 1));
+		Light light = new Light(new Vector3f(30, 20, 30), new Vector3f(1.1f, 1.1f, 1.1f));
 
 		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap);
 		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap);
 
 		Camera camera = new Camera();
 
-		RawModel bunnyModel = OBJLoader.loadOBJModel("stall", loader);
-		TexturedModel stanfordBunny = new TexturedModel(bunnyModel,
-				new ModelTexture(loader.loadTexture("stallTexture")));
+		RawModel bunnyModel = OBJLoader.loadOBJModel("dragon", loader);
+		TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("white")));
 		Player player = new Player(stanfordBunny, new Vector3f(0, 0, -50), 0, 0, 0, 1);
 
 		MasterRenderer renderer = new MasterRenderer();

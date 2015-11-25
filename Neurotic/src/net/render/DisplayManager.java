@@ -11,7 +11,7 @@ import org.lwjgl.opengl.PixelFormat;
 public class DisplayManager {
 
 	private final static String TITLE = "Neurotic";
-	private final static int WIDTH = 1600;
+	private final static int WIDTH = 900;
 	private final static int HEIGHT = WIDTH / 16 * 9;
 	static long lastFrame;
 

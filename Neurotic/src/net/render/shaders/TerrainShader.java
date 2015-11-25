@@ -41,7 +41,7 @@ public class TerrainShader extends Shader {
 		locationProjMatrix = super.getUniformLocation("projectionMatrix");
 		locationViewMatrix = super.getUniformLocation("viewMatrix");
 		locationLight = super.getUniformLocation("lightPosition");
-		locationLight = super.getUniformLocation("lightColor");
+		locationLightColor = super.getUniformLocation("lightColor");
 		locationShineDamper = super.getUniformLocation("shineDamper");
 		locationReflectivity = super.getUniformLocation("reflectivity");
 		locationSkyColor = super.getUniformLocation("skyColor");
@@ -51,13 +51,13 @@ public class TerrainShader extends Shader {
 		locationBTexture = super.getUniformLocation("bTexture");
 		locationBlendMap = super.getUniformLocation("blendMap");
 	}
-	
-	public void connectTextureUnits(){
+
+	public void connectTextureUnits() {
 		super.loadInt(locationBackgroundTexture, 0);
 		super.loadInt(locationRTexture, 1);
 		super.loadInt(locationGTexture, 2);
 		super.loadInt(locationBTexture, 3);
-		super.loadInt(locationBlendMap,4);
+		super.loadInt(locationBlendMap, 4);
 	}
 
 	public void loadSkyColor(Vector3f color) {

@@ -37,7 +37,7 @@ public class StaticShader extends Shader {
 		locationProjMatrix = super.getUniformLocation("projectionMatrix");
 		locationViewMatrix = super.getUniformLocation("viewMatrix");
 		locationLight = super.getUniformLocation("lightPosition");
-		locationLight = super.getUniformLocation("lightColor");
+		locationLightColor = super.getUniformLocation("lightColor");
 		locationShineDamper = super.getUniformLocation("shineDamper");
 		locationReflectivity = super.getUniformLocation("reflectivity");
 		locationFakeLight = super.getUniformLocation("useFakeLighting");

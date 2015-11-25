@@ -19,6 +19,8 @@ public class Player extends Entity {
 	private float currentTurnSpeed = 0;
 	private float upwardsSpeed = 0;
 
+	private boolean isInAir = false;
+
 	public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
 	}
@@ -31,15 +33,19 @@ public class Player extends Entity {
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
 		super.increasePosition(dx, 0, dz);
 		upwardsSpeed += GRAVITY * DisplayManager.getDelta();
-		super.increasePosition(0, upwardsSpeed, 0);
+		super.increasePosition(0, upwardsSpeed * DisplayManager.getDelta(), 0);
 		if (super.getPosition().y < TERRAIN_HEIGHT) {
 			upwardsSpeed = 0;
-			super.getPosition().y = 0;
+			isInAir = false;
+			super.getPosition().y = TERRAIN_HEIGHT;
 		}
 	}
 
 	private void jump() {
-		this.upwardsSpeed = JUMP_POWER;
+		if (!isInAir) {
+			this.upwardsSpeed = JUMP_POWER;
+			isInAir = true;
+		}
 	}
 
 	private void checkInputs() {
