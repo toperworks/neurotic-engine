@@ -22,6 +22,7 @@ import net.render.models.TexturedModel;
 import net.render.textures.ModelTexture;
 import net.render.textures.TerrainTexture;
 import net.render.textures.TerrainTexturePack;
+import net.world.GenerateTerrain;
 import net.world.Terrain;
 
 public class MainGameLoop {
@@ -29,14 +30,6 @@ public class MainGameLoop {
 	public static void main(String[] args) {
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
-
-		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
-		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("dirt"));
-		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("pinkFlowers"));
-		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("path"));
-		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMap"));
-		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture,
-				blendMap);
 
 		ModelData data = OBJFileLoader.loadOBJ("tree");
 
@@ -74,8 +67,7 @@ public class MainGameLoop {
 
 		Light light = new Light(new Vector3f(30, 20, 30), new Vector3f(1.1f, 1.1f, 1.1f));
 
-		Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap);
-		Terrain terrain2 = new Terrain(-1, -1, loader, texturePack, blendMap);
+		GenerateTerrain terrain = new GenerateTerrain(0, -1, loader);
 
 		Camera camera = new Camera();
 
@@ -90,7 +82,6 @@ public class MainGameLoop {
 			renderer.processEntity(player);
 
 			renderer.processTerrain(terrain);
-			renderer.processTerrain(terrain2);
 			for (Entity entity : entities) {
 				renderer.processEntity(entity);
 			}
