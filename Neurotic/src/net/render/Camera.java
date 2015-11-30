@@ -7,8 +7,8 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class Camera {
 
-	private Vector3f position = new Vector3f(10, 10, 10);
-	private float pitch = -30;
+	private Vector3f position = new Vector3f(10, 100, 10);
+	private float pitch = -45;
 	private float yaw = 90;
 	private float roll;
 
@@ -26,7 +26,7 @@ public class Camera {
 
 	public Camera() {
 
-		this.speed = 0.015f;
+		this.speed = 100.5f;
 
 	}
 
@@ -39,6 +39,18 @@ public class Camera {
 		} else if (pitch <= -90) {
 			pitch = -90;
 
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
+			position.z -= speed;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {
+			position.x += speed;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
+			position.x -= speed;
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
+			position.z += speed;
 		}
 
 	}
@@ -57,6 +69,10 @@ public class Camera {
 
 	public float getRoll() {
 		return roll;
+	}
+
+	public void invertPitch() {
+		this.pitch = -this.getPitch();
 	}
 
 }

@@ -2,6 +2,7 @@ package net.render.shaders;
 
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import net.entities.Light;
 import net.render.Camera;
@@ -21,6 +22,7 @@ public class StaticShader extends Shader {
 	private int locationReflectivity;
 	private int locationFakeLight;
 	private int locationSkyColor;
+	private int locationClip;
 
 	public StaticShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -42,6 +44,11 @@ public class StaticShader extends Shader {
 		locationReflectivity = super.getUniformLocation("reflectivity");
 		locationFakeLight = super.getUniformLocation("useFakeLighting");
 		locationSkyColor = super.getUniformLocation("skyColor");
+		locationClip = super.getUniformLocation("plane");
+	}
+	
+	public void loadClipPlace(Vector4f plane){
+		super.loadVector(locationClip, plane);
 	}
 
 	public void loadSkyColor(Vector3f color) {

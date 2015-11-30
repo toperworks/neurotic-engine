@@ -9,24 +9,26 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import net.entities.Entity;
 import net.entities.Light;
+import net.entities.Player;
+import net.render.models.RawModel;
 import net.render.models.TexturedModel;
 import net.render.shaders.StaticShader;
 import net.render.shaders.TerrainShader;
 import net.world.GenerateTerrain;
-import net.world.Terrain;
 
 public class MasterRenderer {
 
 	private static final float FOV = 90;
-	private static final float NEAR_PLANE = 0.1f;
-	private static final float FAR_PLANE = 1000;
+	private static final float NEAR_PLANE = 0.5f;
+	private static final float FAR_PLANE = 4000.0f;
 
-	private static final float RED = 0.1f;
-	private static final float GREEN = 0.1f;
-	private static final float BLUE = 0.1f;
+	private static final float RED = 0.35f;
+	private static final float GREEN = .86f;
+	private static final float BLUE = .96f;
 
 	private Matrix4f projectionMatrix;
 
@@ -37,7 +39,7 @@ public class MasterRenderer {
 	private TerrainShader terrainShader = new TerrainShader();
 
 	private Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
-	private List<GenerateTerrain> terrains = new ArrayList<GenerateTerrain>();
+	private Map<RawModel, List<GenerateTerrain>> terrains = new HashMap<RawModel, List<GenerateTerrain>>();
 
 	public MasterRenderer() {
 		enableCulling();
@@ -55,26 +57,32 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 
-	public void render(Light sun, Camera camera) {
+	public void render(Light sun, Camera camera, List<GenerateTerrain> terrain, List<Entity> ent, Player player,
+			Vector4f clipPlane) {
 		prepare();
+		for (Entity entity : ent) {
+			processEntity(entity);
+		}
+		for (GenerateTerrain ter : terrain) {
+			processTerrain(ter);
+		}
+		processEntity(player);
 		shader.start();
+		shader.loadClipPlace(clipPlane);
 		shader.loadSkyColor(new Vector3f(RED, GREEN, BLUE));
 		shader.loadLight(sun);
 		shader.loadViewMatrix(camera);
 		renderer.render(entities);
 		shader.stop();
 		terrainShader.start();
+		terrainShader.loadClipPlace(clipPlane);
 		terrainShader.loadSkyColor(new Vector3f(RED, GREEN, BLUE));
 		terrainShader.loadLight(sun);
 		terrainShader.loadViewMatrix(camera);
 		terrainRenderer.render(terrains);
 		terrainShader.stop();
-		terrains.clear();
 		entities.clear();
-	}
-
-	public void processTerrain(GenerateTerrain terrain) {
-		terrains.add(terrain);
+		terrains.clear();
 	}
 
 	public void processEntity(Entity entity) {
@@ -87,7 +95,18 @@ public class MasterRenderer {
 			newBatch.add(entity);
 			entities.put(entityModel, newBatch);
 		}
+	}
 
+	public void processTerrain(GenerateTerrain newTerrain) {
+		RawModel terrain = newTerrain.getModel();
+		List<GenerateTerrain> batch = terrains.get(terrain);
+		if (batch != null) {
+			batch.add(newTerrain);
+		} else {
+			List<GenerateTerrain> newBatch = new ArrayList<GenerateTerrain>();
+			newBatch.add(newTerrain);
+			terrains.put(terrain, newBatch);
+		}
 	}
 
 	public void clean() {
@@ -114,6 +133,10 @@ public class MasterRenderer {
 		projectionMatrix.m23 = -1;
 		projectionMatrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustum_length);
 		projectionMatrix.m33 = 0;
+	}
+
+	public Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
 	}
 
 }

@@ -1,11 +1,9 @@
 package net.render;
 
-import java.nio.FloatBuffer;
 import java.util.List;
+import java.util.Map;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
@@ -24,20 +22,17 @@ public class TerrainRenderer {
 		this.shader = shader;
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
-		shader.connectTextureUnits();
 		shader.stop();
 	}
 
-	public void render(List<GenerateTerrain> terrains) {
-		float[] colors = { 1f, 0f, 0f, 1f, 0f, 1f, 0f, 1f, 0f, 0f, 1f, 1f, 1f, 1f, 1f, 1f, };
-		FloatBuffer colorsBuffer = BufferUtils.createFloatBuffer(colors.length);
-		colorsBuffer.put(colors);
-		colorsBuffer.flip();
-		for (GenerateTerrain terrain : terrains) {
-			prepareTerrain(terrain);
-			loadModelMatrix(terrain);
-			GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorsBuffer, GL15.GL_STATIC_DRAW);
-			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+	public void render(Map<RawModel, List<GenerateTerrain>> terrains) {
+		for (RawModel model : terrains.keySet()) {
+			List<GenerateTerrain> batch = terrains.get(model);
+			for (GenerateTerrain terrain : batch) {
+				prepareTerrain(terrain);
+				loadModelMatrix(terrain);
+				GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			}
 			unbindTerrain();
 		}
 	}
@@ -49,7 +44,8 @@ public class TerrainRenderer {
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
 		bindTextures(terrain);
-		shader.loadShineVariables(1, 0);
+		shader.loadTextureColor(new Vector3f(0.56f, 0.33f, 0.12f));
+		shader.loadShineVariables(500, 0.1f);
 	}
 
 	private void bindTextures(GenerateTerrain terrain) {
