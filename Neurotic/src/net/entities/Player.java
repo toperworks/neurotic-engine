@@ -5,13 +5,14 @@ import org.lwjgl.util.vector.Vector3f;
 
 import net.render.DisplayManager;
 import net.render.models.TexturedModel;
+import net.world.GenerateTerrain;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = 20;
+	private static final float RUN_SPEED = 160;
 	private static final float TURN_SPEED = 160;
 	private static final float GRAVITY = -50;
-	private static final float JUMP_POWER = 10;
+	private static final float JUMP_POWER = 100;
 
 	private static final float TERRAIN_HEIGHT = 0;
 
@@ -25,27 +26,19 @@ public class Player extends Entity {
 		super(model, position, rotX, rotY, rotZ, scale);
 	}
 
-	public void move() {
+	public void move(GenerateTerrain t) {
 		checkInputs();
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getDelta(), 0);
 		float distance = currentSpeed * DisplayManager.getDelta();
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
 		super.increasePosition(dx, 0, dz);
-		upwardsSpeed += GRAVITY * DisplayManager.getDelta();
-		super.increasePosition(0, upwardsSpeed * DisplayManager.getDelta(), 0);
-		if (super.getPosition().y < TERRAIN_HEIGHT) {
-			upwardsSpeed = 0;
-			isInAir = false;
-			super.getPosition().y = TERRAIN_HEIGHT;
+		if (t != null) {
+			super.getPosition().y = t.getHeight(super.getPosition().x, super.getPosition().z, 2);
 		}
 	}
 
 	private void jump() {
-		if (!isInAir) {
-			this.upwardsSpeed = JUMP_POWER;
-			isInAir = true;
-		}
 	}
 
 	private void checkInputs() {

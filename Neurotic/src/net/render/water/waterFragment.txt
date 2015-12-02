@@ -16,7 +16,7 @@ uniform vec3 lightColor;
 
 uniform float moveFactor;
 
-const float waveStrength = 0.05;
+const float waveStrength = 0.01;
 const float shineDamper = 50.0;
 const float reflectivity = 0.6;
 
@@ -55,7 +55,7 @@ void main(void) {
 
 	vec3 viewVector = normalize(toCameraVector);
 	float refractiveFactor = dot(viewVector,normal);
-	refractiveFactor = pow(refractiveFactor,0.5);
+	refractiveFactor = pow(refractiveFactor,0.25);
 	refractiveFactor = clamp(refractiveFactor,0.0, 1.0);
 	
 	

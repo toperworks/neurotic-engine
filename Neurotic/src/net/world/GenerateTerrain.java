@@ -9,8 +9,10 @@ import net.tools.Tools;
 
 public class GenerateTerrain {
 
-	private static final float MAX_HEIGHT = 180;
+	private static final float MAX_HEIGHT = 80;
 
+	private float xPos;
+	private float zPos;
 	private float x;
 	private float z;
 	private RawModel model;
@@ -18,16 +20,25 @@ public class GenerateTerrain {
 
 	private float[][] heights;
 	private Vector3f[][] normals;
-	public static final int SIZE = 800;
+	public static final float SIZE = 800;
 	private static final int VERTEX_COUNT = 550;
 
 	Loader l;
 
-	public GenerateTerrain(int i, int j, Loader loader) {
+	public GenerateTerrain(int x, int z, Loader loader, float[][] heights) {
 		l = loader;
-		x = i * SIZE;
-		z = j * SIZE;
-		model = generateTerrain(loader);
+		xPos = x * SIZE;
+		zPos = z * SIZE;
+		this.x = x;
+		this.z = z;
+		this.heights = new float[(int) SIZE][(int) SIZE];
+		for (int xa = 0; xa < VERTEX_COUNT; xa++) {
+			for (int za = 0; za < VERTEX_COUNT; za++) {
+				this.heights[xa][za] = heights[(int) ((xa * (SIZE / VERTEX_COUNT)) + this.xPos)][(int) (za
+						* (SIZE / VERTEX_COUNT) + this.zPos)] * MAX_HEIGHT;
+			}
+		}
+		generateTerrain(l);
 		texture = loader.loadTexture("grassy");
 	}
 
@@ -36,8 +47,8 @@ public class GenerateTerrain {
 	}
 
 	public float getHeightOfTerrain(float worldX, float worldZ) {
-		float terrainX = worldX - this.x;
-		float terrainZ = worldZ - this.z;
+		float terrainX = worldX - this.xPos;
+		float terrainZ = worldZ - this.zPos;
 		float gridSquareSize = SIZE / (float) (heights.length - 1);
 		int gridX = (int) Math.floor(terrainX / gridSquareSize);
 		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
@@ -59,12 +70,7 @@ public class GenerateTerrain {
 		return answer;
 	}
 
-	OpenSimplexNoise n1 = new OpenSimplexNoise(50);
-	OpenSimplexNoise n2 = new OpenSimplexNoise(100);
-	OpenSimplexNoise n3 = new OpenSimplexNoise(150);
-
-	private RawModel generateTerrain(Loader loader) {
-		heights = new float[VERTEX_COUNT][VERTEX_COUNT];
+	public void generateTerrain(Loader loader) {
 		normals = new Vector3f[VERTEX_COUNT][VERTEX_COUNT];
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
@@ -72,27 +78,18 @@ public class GenerateTerrain {
 		float[] textureCoords = new float[count * 2];
 		int[] indices = new int[6 * (VERTEX_COUNT - 1) * (VERTEX_COUNT * 1)];
 		int vertexPointer = 0;
-		for (int x = 0; x < VERTEX_COUNT; x++) {
-			for (int z = 0; z < VERTEX_COUNT; z++) {
-				int xa = (int) (x + this.x);
-				int za = (int) (z + this.z);
-				float value = (float) ((n1.eval(xa / 48.0, za / 48.0, 0.5) + n2.eval(xa / 24.0, za / 24.0, 0.5) * .5
-						+ n3.eval(xa / 12.0, za / 12.0, 0.5) * .25) / (1 + .5 + .25));
-				heights[x][z] = value * MAX_HEIGHT;
-			}
-		}
-		for (int i = 0; i < VERTEX_COUNT; i++) {
-			for (int j = 0; j < VERTEX_COUNT; j++) {
-				vertices[vertexPointer * 3] = (float) j / ((float) VERTEX_COUNT - 1) * SIZE;
-				vertices[vertexPointer * 3 + 1] = getHeight(i, j);
-				vertices[vertexPointer * 3 + 2] = (float) i / ((float) VERTEX_COUNT - 1) * SIZE;
-				Vector3f normal = calculateNormal(j, i);
-				this.normals[i][j] = normal;
+		for (int z = 0; z < VERTEX_COUNT; z++) {
+			for (int x = 0; x < VERTEX_COUNT; x++) {
+				vertices[vertexPointer * 3] = (float) x / ((float) VERTEX_COUNT - 1) * SIZE;
+				vertices[vertexPointer * 3 + 1] = getHeight(x, z, 0);
+				vertices[vertexPointer * 3 + 2] = (float) z / ((float) VERTEX_COUNT - 1) * SIZE;
+				Vector3f normal = calculateNormal(x, z);
+				this.normals[x][z] = normal;
 				normals[vertexPointer * 3] = normal.x;
 				normals[vertexPointer * 3 + 1] = normal.y;
 				normals[vertexPointer * 3 + 2] = normal.z;
-				textureCoords[vertexPointer * 2] = (float) j / ((float) VERTEX_COUNT - 1);
-				textureCoords[vertexPointer * 2 + 1] = (float) i / ((float) VERTEX_COUNT - 1);
+				textureCoords[vertexPointer * 2] = (float) x / ((float) VERTEX_COUNT - 1);
+				textureCoords[vertexPointer * 2 + 1] = (float) z / ((float) VERTEX_COUNT - 1);
 				vertexPointer++;
 			}
 		}
@@ -111,37 +108,67 @@ public class GenerateTerrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
-		return loader.loadToVAO(vertices, textureCoords, normals, indices);
+		model = loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
 	public Vector3f calculateNormal(int x, int z) {
-		float heightL = getHeight(x - 1, z);
-		float heightR = getHeight(x + 1, z);
-		float heightD = getHeight(x, z - 1);
-		float heightU = getHeight(x, z + 1);
+		float heightL = getHeight(x - 1, z, 0);
+		float heightR = getHeight(x + 1, z, 0);
+		float heightD = getHeight(x, z - 1, 0);
+		float heightU = getHeight(x, z + 1, 0);
 		Vector3f normal = new Vector3f(heightL - heightR, 2f, heightD - heightU);
 		normal.normalise();
 		return normal;
 	}
 
-	public Vector3f getNormal(int x, int z) {
-		return calculateNormal(x, z);
+	public Vector3f getNormal(float x, float z) {
+		x = (int) ((x - this.xPos - 1) * (VERTEX_COUNT / SIZE));
+		z = (int) ((z - this.zPos - 1) * (VERTEX_COUNT / SIZE));
+		if ((int) x >= 0 && (int) z >= 0) {
+			return normals[(int) x][(int) z];
+		} else {
+			return new Vector3f(0, 1, 0);
+		}
 	}
 
-	private float getHeight(int x, int z) {
-		return getHeightOfTerrain(this.x + x, this.z + z);
+	public float getHeight(float x, float z, int affix) {
+		if (affix == 1) {
+			x = (int) ((x - this.xPos) * (VERTEX_COUNT / SIZE));
+			z = (int) ((z - this.zPos) * (VERTEX_COUNT / SIZE));
+		}
+		if (affix == 2) {
+			x = (int) (x - this.xPos) * (VERTEX_COUNT / SIZE);
+			z = (int) (z - this.zPos) * (VERTEX_COUNT / SIZE);
+		}
+		if ((int) x >= 0 && (int) z >= 0) {
+			return heights[(int) x][(int) z];
+		} else {
+			return 0;
+		}
 	}
 
-	public float getX() {
+	public float getChunkX() {
 		return x;
 	}
 
-	public float getZ() {
+	public float getChunkZ() {
 		return z;
+	}
+
+	public float getX() {
+		return xPos;
+	}
+
+	public float getZ() {
+		return zPos;
 	}
 
 	public RawModel getModel() {
 		return model;
+	}
+
+	public static float getVertexCount() {
+		return VERTEX_COUNT;
 	}
 
 }

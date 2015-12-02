@@ -82,10 +82,8 @@ public class MainGameLoop {
 				float z = random.nextInt(1600);
 				GenerateTerrain t = terrain.getChunk(x, z);
 				if (t != null) {
-					System.out.println(t.getNormal((int) x, (int) z).x);
-					entities.add(new Entity(staticModel, new Vector3f(x, t.getHeightOfTerrain(x, z), z),
-							t.getNormal((int) x, (int) z).x*90f, t.getNormal((int) x, (int) z).y*90f,
-							t.getNormal((int) x, (int) z).z*90f, random.nextFloat() * 5 + 4));
+					entities.add(new Entity(staticModel, new Vector3f(x, t.getHeight(x, z, 1), z), t.getNormal(x, z).x,
+							t.getNormal(x, z).y, t.getNormal(x, z).z, 10f));
 				}
 			}
 		}
@@ -96,15 +94,14 @@ public class MainGameLoop {
 
 		Light light = new Light(new Vector3f(3000, 1000, 3000), new Vector3f(1.0f, 1.0f, 1.0f));
 
-		Camera camera = new Camera();
-
-		RawModel bunnyModel = OBJLoader.loadOBJModel("dragon", loader);
-		TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("white")));
+		RawModel bunnyModel = OBJLoader.loadOBJModel("tree", loader);
+		TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("blendmap")));
 		Player player = new Player(stanfordBunny, new Vector3f(0, 0, 0), 0, 0, 0, 10);
+		Camera camera = new Camera(player);
 
 		while (!Display.isCloseRequested()) {
 			camera.move();
-			player.move();
+			player.move(terrain.getChunk(player.getPosition().x, player.getPosition().z));
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			fbos.bindReflectionFrameBuffer();
 			float distance = 2 * camera.getPosition().y - water.getHeight();

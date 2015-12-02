@@ -19,6 +19,7 @@ import net.render.models.TexturedModel;
 import net.render.shaders.StaticShader;
 import net.render.shaders.TerrainShader;
 import net.world.GenerateTerrain;
+import net.world.TerrainHolder;
 
 public class MasterRenderer {
 
@@ -57,14 +58,16 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 
-	public void render(Light sun, Camera camera, List<GenerateTerrain> terrain, List<Entity> ent, Player player,
+	public void render(Light sun, Camera camera, GenerateTerrain[] terrain, List<Entity> ent, Player player,
 			Vector4f clipPlane) {
 		prepare();
 		for (Entity entity : ent) {
 			processEntity(entity);
 		}
-		for (GenerateTerrain ter : terrain) {
-			processTerrain(ter);
+		for (int z = 0; z < TerrainHolder.getSize(); z++) {
+			for (int x = 0; x < TerrainHolder.getSize(); x++) {
+				processTerrain(terrain[x + z * TerrainHolder.getSize()]);
+			}
 		}
 		processEntity(player);
 		shader.start();
