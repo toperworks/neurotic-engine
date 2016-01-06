@@ -5,11 +5,12 @@ import org.lwjgl.util.vector.Vector3f;
 
 import net.render.Loader;
 import net.render.models.RawModel;
+import net.render.water.WaterTile;
 import net.tools.Tools;
 
 public class GenerateTerrain {
 
-	private static final float MAX_HEIGHT = 80;
+	private static final float MAX_HEIGHT = 178;
 
 	private float xPos;
 	private float zPos;
@@ -17,11 +18,12 @@ public class GenerateTerrain {
 	private float z;
 	private RawModel model;
 	private int texture;
+	private WaterTile water;
 
 	private float[][] heights;
 	private Vector3f[][] normals;
-	public static final float SIZE = 800;
-	private static final int VERTEX_COUNT = 550;
+	public static final float SIZE = 900;
+	private static final int VERTEX_COUNT = 640/4;
 
 	Loader l;
 
@@ -31,6 +33,7 @@ public class GenerateTerrain {
 		zPos = z * SIZE;
 		this.x = x;
 		this.z = z;
+		water = new WaterTile((int)xPos, (int)zPos, 0, SIZE);
 		this.heights = new float[(int) SIZE][(int) SIZE];
 		for (int xa = 0; xa < VERTEX_COUNT; xa++) {
 			for (int za = 0; za < VERTEX_COUNT; za++) {
@@ -169,6 +172,10 @@ public class GenerateTerrain {
 
 	public static float getVertexCount() {
 		return VERTEX_COUNT;
+	}
+
+	public WaterTile getWater() {
+		return water;
 	}
 
 }

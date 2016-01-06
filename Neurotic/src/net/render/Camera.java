@@ -31,7 +31,7 @@ public class Camera {
 	}
 
 	public void invertPitch() {
-		yaw = -yaw;
+		this.pitch = -this.getPitch();
 	}
 
 	public Vector3f getPosition() {

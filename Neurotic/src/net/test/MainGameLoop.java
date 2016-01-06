@@ -31,41 +31,38 @@ import net.world.GenerateTerrain;
 import net.world.TerrainHolder;
 
 public class MainGameLoop {
+	Loader loader = new Loader();
+	List<Entity> entities = new ArrayList<Entity>();
+	ModelData data = OBJFileLoader.loadOBJ("tree");
+	MasterRenderer renderer = new MasterRenderer();
+	RawModel treeModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(),
+			data.getIndices());
 
-	public static void main(String[] args) {
-		DisplayManager.createDisplay();
-		Loader loader = new Loader();
+	WaterFrameBuffers fbos = new WaterFrameBuffers();
 
-		ModelData data = OBJFileLoader.loadOBJ("tree");
+	WaterShader waterShader = new WaterShader();
+	WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
+	TerrainHolder terrain = new TerrainHolder(6);
+	TexturedModel grass = new TexturedModel(OBJLoader.loadOBJModel("grassModel", loader),
+			new ModelTexture(loader.loadTexture("grassTexture")));
+	TexturedModel fern = new TexturedModel(OBJLoader.loadOBJModel("fern", loader),
+			new ModelTexture(loader.loadTexture("fern")));
+	TexturedModel staticModel = new TexturedModel(treeModel, new ModelTexture(loader.loadTexture("tree")));
+	ModelTexture texture = staticModel.getTexture();
+	Light light = new Light(new Vector3f(3000, 1000, 3000), new Vector3f(1.0f, 1.0f, 1.0f));
 
-		MasterRenderer renderer = new MasterRenderer();
-		RawModel treeModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(),
-				data.getIndices());
+	RawModel bunnyModel = OBJLoader.loadOBJModel("tree", loader);
+	TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("blendmap")));
+	Player player = new Player(stanfordBunny, new Vector3f(0, 0, 0), 0, 0, 0, 10);
+	Camera camera = new Camera(player);
 
-		WaterFrameBuffers fbos = new WaterFrameBuffers();
-
-		WaterShader waterShader = new WaterShader();
-		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
-		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(0, 0, 0);
-		waters.add(water);
-
-		TerrainHolder terrain = new TerrainHolder(2);
+	public MainGameLoop() {
 		terrain.generate(loader);
-
-		TexturedModel staticModel = new TexturedModel(treeModel, new ModelTexture(loader.loadTexture("tree")));
-
-		TexturedModel grass = new TexturedModel(OBJLoader.loadOBJModel("grassModel", loader),
-				new ModelTexture(loader.loadTexture("grassTexture")));
 		grass.getTexture().setTransparency(true);
 		grass.getTexture().setUseFakeLighting(true);
-		TexturedModel fern = new TexturedModel(OBJLoader.loadOBJModel("fern", loader),
-				new ModelTexture(loader.loadTexture("fern")));
 		fern.getTexture().setTransparency(true);
 		fern.getTexture().setUseFakeLighting(true);
-
-		List<Entity> entities = new ArrayList<Entity>();
-		Random random = new Random(676452);
+		Random random = new Random();
 		for (int i = 0; i < 500; i++) {
 			if (i % 7 == 0) {
 				float x = random.nextInt(1600);
@@ -88,47 +85,45 @@ public class MainGameLoop {
 			}
 		}
 
-		ModelTexture texture = staticModel.getTexture();
 		texture.setShineDamper(10);
 		texture.setReflectivity(2);
 
-		Light light = new Light(new Vector3f(3000, 1000, 3000), new Vector3f(1.0f, 1.0f, 1.0f));
-
-		RawModel bunnyModel = OBJLoader.loadOBJModel("tree", loader);
-		TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("blendmap")));
-		Player player = new Player(stanfordBunny, new Vector3f(0, 0, 0), 0, 0, 0, 10);
-		Camera camera = new Camera(player);
-
 		while (!Display.isCloseRequested()) {
-			camera.move();
-			player.move(terrain.getChunk(player.getPosition().x, player.getPosition().z));
-			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-			fbos.bindReflectionFrameBuffer();
-			float distance = 2 * camera.getPosition().y - water.getHeight();
-
-			camera.getPosition().y -= distance;
-			camera.invertPitch();
-			renderer.render(light, camera, terrain.getTerrains(), entities, player,
-					new Vector4f(0, 1, 0, -water.getHeight() + 1f));
-			camera.getPosition().y += distance;
-			camera.invertPitch();
-
-			fbos.bindRefractionFrameBuffer();
-			renderer.render(light, camera, terrain.getTerrains(), entities, player,
-					new Vector4f(0, -1, 0, water.getHeight()));
-
-			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
-			fbos.unbindCurrentFrameBuffer();
-			renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, -1, 0, 10000));
-			waterRenderer.render(waters, camera, light);
-
-			DisplayManager.updateDisplay();
-
+			render();
 		}
 		renderer.clean();
 		fbos.clean();
 		loader.clean();
 		DisplayManager.closeDisplay();
+	}
+
+	public void render() {
+		camera.move();
+		player.move(terrain.getChunk(player.getPosition().x, player.getPosition().z));
+		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+		fbos.bindReflectionFrameBuffer();
+		float distance = 2 * camera.getPosition().y;
+
+		camera.getPosition().y -= distance;
+		camera.invertPitch();
+		renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, 1, 0, -0 + 1f));
+		camera.getPosition().y += distance;
+		camera.invertPitch();
+
+		fbos.bindRefractionFrameBuffer();
+		renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, 0, 0, 0));
+
+		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+		fbos.unbindCurrentFrameBuffer();
+		renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, 0, 0, 10000));
+		waterRenderer.render(terrain.getWater(), camera, light);
+
+		DisplayManager.updateDisplay();
+	}
+
+	public static void main(String[] args) {
+		DisplayManager.createDisplay();
+		new MainGameLoop();
 	}
 
 }

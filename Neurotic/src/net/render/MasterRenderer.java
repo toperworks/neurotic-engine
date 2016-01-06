@@ -24,12 +24,12 @@ import net.world.TerrainHolder;
 public class MasterRenderer {
 
 	private static final float FOV = 90;
-	private static final float NEAR_PLANE = 0.5f;
-	private static final float FAR_PLANE = 4000.0f;
+	private static final float NEAR_PLANE = 1f;
+	private static final float FAR_PLANE = 2000.0f;
 
-	private static final float RED = 0.35f;
-	private static final float GREEN = .86f;
-	private static final float BLUE = .96f;
+	private static final float RED = 0.9f;
+	private static final float GREEN = .9f;
+	private static final float BLUE = .9f;
 
 	private Matrix4f projectionMatrix;
 
@@ -71,6 +71,7 @@ public class MasterRenderer {
 		}
 		processEntity(player);
 		shader.start();
+		shader.loadAmbientLight(0.35f);
 		shader.loadClipPlace(clipPlane);
 		shader.loadSkyColor(new Vector3f(RED, GREEN, BLUE));
 		shader.loadLight(sun);
@@ -78,6 +79,7 @@ public class MasterRenderer {
 		renderer.render(entities);
 		shader.stop();
 		terrainShader.start();
+		terrainShader.loadAmbientLight(0.35f);
 		terrainShader.loadClipPlace(clipPlane);
 		terrainShader.loadSkyColor(new Vector3f(RED, GREEN, BLUE));
 		terrainShader.loadLight(sun);

@@ -5,11 +5,13 @@ in vec3 surfaceNormal;
 in vec3 toLightVector;
 in vec3 toCameraVector;
 in float visibility;
+in float height;
  
 out vec4 out_Color;
 
-uniform vec3 color;
-
+uniform vec3 color1;
+uniform vec3 color2;
+uniform float ambientLight;
 uniform vec3 lightColor;
 uniform float shineDamper;
 uniform float reflectivity;
@@ -18,14 +20,17 @@ uniform vec3 skyColor;
 void main(void){
 
 	vec2 tiledCoords = pass_textureCoords * 40.0;
-	
-	vec4 totalColor = vec4(color,1.0f);
+
+	vec4 top = vec4(color1,1.0f);
+	vec4 bottom = vec4(color2,1.0f);
+
+	vec4 totalColor = vec4(mix(top, bottom, height/50));
 
 	vec3 unitNormal = normalize(surfaceNormal);
 	vec3 unitLightVector = normalize(toLightVector);
 
 	float nDot1 = dot(unitNormal,unitLightVector);
-	float brightness = max(nDot1,0.2);
+	float brightness = max(nDot1,ambientLight);
 	vec3 diffuse = brightness * lightColor;
 
 	vec3 lightDirection = -unitLightVector;
@@ -37,7 +42,7 @@ void main(void){
 	float dampedFactor = pow(specFactor,shineDamper);
 	vec3 finalSpec = dampedFactor * reflectivity * lightColor;
 
-	out_Color = vec4(diffuse,1.0) * totalColor + vec4(finalSpec,1.0);
+	out_Color = vec4(diffuse,1.0) * totalColor + vec4(finalSpec,0.75);
 	out_Color = mix(vec4(skyColor,1.0),out_Color,visibility);
 
 }

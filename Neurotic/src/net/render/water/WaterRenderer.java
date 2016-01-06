@@ -22,7 +22,7 @@ public class WaterRenderer {
 	private static final String NORMAL_MAP = "normalMap";
 	private int dudvTexture;
 	private int normalMapTexture;
-	private static final float WAVE_SPEED = 0.035f;
+	private static final float WAVE_SPEED = 0.045f;
 
 	private RawModel quad;
 	private WaterShader shader;
@@ -84,7 +84,7 @@ public class WaterRenderer {
 	}
 
 	private void setUpVAO(Loader loader) {
-		float[] vertices = { -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1 };
+		float[] vertices = { 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1 };
 		quad = loader.loadToVAO(vertices, 2);
 
 	}

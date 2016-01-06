@@ -22,6 +22,7 @@ public class StaticShader extends Shader {
 	private int locationReflectivity;
 	private int locationFakeLight;
 	private int locationSkyColor;
+	private int locationAmbient;
 	private int locationClip;
 
 	public StaticShader() {
@@ -44,11 +45,16 @@ public class StaticShader extends Shader {
 		locationReflectivity = super.getUniformLocation("reflectivity");
 		locationFakeLight = super.getUniformLocation("useFakeLighting");
 		locationSkyColor = super.getUniformLocation("skyColor");
+		locationAmbient = super.getUniformLocation("ambientLight");
 		locationClip = super.getUniformLocation("plane");
 	}
-	
-	public void loadClipPlace(Vector4f plane){
+
+	public void loadClipPlace(Vector4f plane) {
 		super.loadVector(locationClip, plane);
+	}
+
+	public void loadAmbientLight(float ambient) {
+		super.loadFloat(locationAmbient, ambient);
 	}
 
 	public void loadSkyColor(Vector3f color) {

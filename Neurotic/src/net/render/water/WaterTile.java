@@ -2,7 +2,7 @@ package net.render.water;
 
 public class WaterTile {
 
-	public static final float TILE_SIZE = 960;
+	public static float TILE_SIZE;
 
 	private float height;
 	private float x, z;
@@ -11,6 +11,12 @@ public class WaterTile {
 		this.x = centerX;
 		this.z = centerZ;
 		this.height = height;
+	}
+
+	public WaterTile(int x2, int z2, int i, float size) {
+		this.x = x2;
+		this.z = z2;
+		TILE_SIZE = size;
 	}
 
 	public float getHeight() {

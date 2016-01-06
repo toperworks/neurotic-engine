@@ -44,8 +44,10 @@ public class TerrainRenderer {
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
 		bindTextures(terrain);
-		shader.loadTextureColor(new Vector3f(0.56f, 0.33f, 0.12f));
-		shader.loadShineVariables(500, 0.1f);
+		shader.loadTextureColor1(new Vector3f(0.160f, 0.082f, 0.045f));
+		shader.loadAmbientLight(0.35f);
+		shader.loadTextureColor2(new Vector3f(0.1f, 0.5f, 0.1f));
+		shader.loadShineVariables(500, 0.0000000001f);
 	}
 
 	private void bindTextures(GenerateTerrain terrain) {

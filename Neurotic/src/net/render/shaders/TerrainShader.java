@@ -21,7 +21,9 @@ public class TerrainShader extends Shader {
 	private int locationShineDamper;
 	private int locationReflectivity;
 	private int locationSkyColor;
-	private int locationColor;
+	private int locationColor1;
+	private int locationColor2;
+	private int locationAmbient;
 	private int locationClip;
 
 	public TerrainShader() {
@@ -43,7 +45,9 @@ public class TerrainShader extends Shader {
 		locationShineDamper = super.getUniformLocation("shineDamper");
 		locationReflectivity = super.getUniformLocation("reflectivity");
 		locationSkyColor = super.getUniformLocation("skyColor");
-		locationColor = super.getUniformLocation("color");
+		locationColor1 = super.getUniformLocation("color1");
+		locationColor2 = super.getUniformLocation("color2");
+		locationAmbient = super.getUniformLocation("ambientLight");
 		locationClip = super.getUniformLocation("plane");
 	}
 
@@ -51,8 +55,16 @@ public class TerrainShader extends Shader {
 		super.loadVector(locationClip, plane);
 	}
 
-	public void loadTextureColor(Vector3f color) {
-		super.loadVector(locationColor, color);
+	public void loadAmbientLight(float ambient) {
+		super.loadFloat(locationAmbient, ambient);
+	}
+
+	public void loadTextureColor1(Vector3f color) {
+		super.loadVector(locationColor1, color);
+	}
+
+	public void loadTextureColor2(Vector3f color) {
+		super.loadVector(locationColor2, color);
 	}
 
 	public void loadSkyColor(Vector3f color) {
