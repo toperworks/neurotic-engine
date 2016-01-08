@@ -14,6 +14,7 @@ import net.render.Camera;
 import net.render.DisplayManager;
 import net.render.Loader;
 import net.render.models.RawModel;
+import net.test.MainGameLoop;
 import net.tools.Tools;
 
 public class WaterRenderer {
@@ -59,6 +60,7 @@ public class WaterRenderer {
 		shader.start();
 		shader.loadMoveFactor(moveFactor);
 		shader.loadLight(sun);
+		shader.loadSkyColor(MainGameLoop.SKY_COLOR);
 		shader.loadViewMatrix(camera);
 		GL30.glBindVertexArray(quad.getVaoID());
 		GL20.glEnableVertexAttribArray(0);

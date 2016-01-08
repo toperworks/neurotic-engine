@@ -10,7 +10,7 @@ import net.tools.Tools;
 
 public class GenerateTerrain {
 
-	private static final float MAX_HEIGHT = 178;
+	private static final float MAX_HEIGHT = 200;
 
 	private float xPos;
 	private float zPos;
@@ -19,13 +19,19 @@ public class GenerateTerrain {
 	private RawModel model;
 	private int texture;
 	private WaterTile water;
+	private boolean hasWater = false;
 
 	private float[][] heights;
-	private Vector3f[][] normals;
-	public static final float SIZE = 900;
-	private static final int VERTEX_COUNT = 640/4;
-
+	public static final float SIZE = 500;
+	public static final int VERTEX_COUNT = 250;
+	private Vector3f[][] accessableNormals = new Vector3f[VERTEX_COUNT][VERTEX_COUNT];
 	Loader l;
+	int count = VERTEX_COUNT * VERTEX_COUNT;
+	float[] vertices = new float[count * 3];
+	float[] normals = new float[count * 3];
+	float[] textureCoords = new float[count * 2];
+	int[] indices = new int[6 * (VERTEX_COUNT - 1) * (VERTEX_COUNT * 1)];
+	boolean isDefaultModel = true;
 
 	public GenerateTerrain(int x, int z, Loader loader, float[][] heights) {
 		l = loader;
@@ -33,16 +39,18 @@ public class GenerateTerrain {
 		zPos = z * SIZE;
 		this.x = x;
 		this.z = z;
-		water = new WaterTile((int)xPos, (int)zPos, 0, SIZE);
+		water = new WaterTile((int) xPos, (int) zPos, 0, SIZE);
 		this.heights = new float[(int) SIZE][(int) SIZE];
 		for (int xa = 0; xa < VERTEX_COUNT; xa++) {
 			for (int za = 0; za < VERTEX_COUNT; za++) {
-				this.heights[xa][za] = heights[(int) ((xa * (SIZE / VERTEX_COUNT)) + this.xPos)][(int) (za
-						* (SIZE / VERTEX_COUNT) + this.zPos)] * MAX_HEIGHT;
+				this.heights[xa][za] = heights[(int) ((xa * (SIZE / VERTEX_COUNT)))][(int) (za
+						* (SIZE / VERTEX_COUNT))] * MAX_HEIGHT;
+				if (this.heights[xa][za] <= 0) {
+					hasWater = true;
+				}
 			}
 		}
 		generateTerrain(l);
-		texture = loader.loadTexture("grassy");
 	}
 
 	public int getTexture() {
@@ -74,12 +82,6 @@ public class GenerateTerrain {
 	}
 
 	public void generateTerrain(Loader loader) {
-		normals = new Vector3f[VERTEX_COUNT][VERTEX_COUNT];
-		int count = VERTEX_COUNT * VERTEX_COUNT;
-		float[] vertices = new float[count * 3];
-		float[] normals = new float[count * 3];
-		float[] textureCoords = new float[count * 2];
-		int[] indices = new int[6 * (VERTEX_COUNT - 1) * (VERTEX_COUNT * 1)];
 		int vertexPointer = 0;
 		for (int z = 0; z < VERTEX_COUNT; z++) {
 			for (int x = 0; x < VERTEX_COUNT; x++) {
@@ -87,7 +89,7 @@ public class GenerateTerrain {
 				vertices[vertexPointer * 3 + 1] = getHeight(x, z, 0);
 				vertices[vertexPointer * 3 + 2] = (float) z / ((float) VERTEX_COUNT - 1) * SIZE;
 				Vector3f normal = calculateNormal(x, z);
-				this.normals[x][z] = normal;
+				this.accessableNormals[x][z] = normal;
 				normals[vertexPointer * 3] = normal.x;
 				normals[vertexPointer * 3 + 1] = normal.y;
 				normals[vertexPointer * 3 + 2] = normal.z;
@@ -111,7 +113,29 @@ public class GenerateTerrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
-		model = loader.loadToVAO(vertices, textureCoords, normals, indices);
+	}
+
+	public int[] indices() {
+		return indices;
+	}
+
+	public float[] normals() {
+		return normals;
+	}
+
+	public float[] textureCoords() {
+		return textureCoords;
+	}
+
+	public float[] vertices() {
+		return vertices;
+	}
+
+	// Need method so that another method in another class with the GL Context
+	// thread can create the model and send it back to here
+	public void setModel(RawModel model) {
+		isDefaultModel = false;
+		this.model = model;
 	}
 
 	public Vector3f calculateNormal(int x, int z) {
@@ -128,7 +152,7 @@ public class GenerateTerrain {
 		x = (int) ((x - this.xPos - 1) * (VERTEX_COUNT / SIZE));
 		z = (int) ((z - this.zPos - 1) * (VERTEX_COUNT / SIZE));
 		if ((int) x >= 0 && (int) z >= 0) {
-			return normals[(int) x][(int) z];
+			return accessableNormals[(int) x][(int) z];
 		} else {
 			return new Vector3f(0, 1, 0);
 		}
@@ -170,12 +194,20 @@ public class GenerateTerrain {
 		return model;
 	}
 
+	public boolean hasWater() {
+		return hasWater;
+	}
+
 	public static float getVertexCount() {
 		return VERTEX_COUNT;
 	}
 
 	public WaterTile getWater() {
 		return water;
+	}
+
+	public boolean isDefaultModel() {
+		return isDefaultModel;
 	}
 
 }

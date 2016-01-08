@@ -31,10 +31,11 @@ import net.world.GenerateTerrain;
 import net.world.TerrainHolder;
 
 public class MainGameLoop {
+	public static final Vector3f SKY_COLOR = new Vector3f(0.7f, 0.7f, 0.9f);
 	Loader loader = new Loader();
 	List<Entity> entities = new ArrayList<Entity>();
 	ModelData data = OBJFileLoader.loadOBJ("tree");
-	MasterRenderer renderer = new MasterRenderer();
+	MasterRenderer renderer = new MasterRenderer(loader);
 	RawModel treeModel = loader.loadToVAO(data.getVertices(), data.getTextureCoords(), data.getNormals(),
 			data.getIndices());
 
@@ -42,7 +43,8 @@ public class MainGameLoop {
 
 	WaterShader waterShader = new WaterShader();
 	WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
-	TerrainHolder terrain = new TerrainHolder(6);
+	Thread t = new Thread(new TerrainHolder(10, loader));
+
 	TexturedModel grass = new TexturedModel(OBJLoader.loadOBJModel("grassModel", loader),
 			new ModelTexture(loader.loadTexture("grassTexture")));
 	TexturedModel fern = new TexturedModel(OBJLoader.loadOBJModel("fern", loader),
@@ -57,7 +59,7 @@ public class MainGameLoop {
 	Camera camera = new Camera(player);
 
 	public MainGameLoop() {
-		terrain.generate(loader);
+		t.start();
 		grass.getTexture().setTransparency(true);
 		grass.getTexture().setUseFakeLighting(true);
 		fern.getTexture().setTransparency(true);
@@ -67,7 +69,7 @@ public class MainGameLoop {
 			if (i % 7 == 0) {
 				float x = random.nextInt(1600);
 				float z = random.nextInt(1600);
-				GenerateTerrain t = terrain.getChunk(x, z);
+				GenerateTerrain t = TerrainHolder.getChunk(x, z);
 				if (t != null) {
 					entities.add(new Entity(grass, new Vector3f(x, t.getHeightOfTerrain(x, z), z),
 							t.getNormal((int) x, (int) z).x, t.getNormal((int) x, (int) z).y,
@@ -77,7 +79,7 @@ public class MainGameLoop {
 			if (i % 3 == 0) {
 				float x = random.nextInt(1600);
 				float z = random.nextInt(1600);
-				GenerateTerrain t = terrain.getChunk(x, z);
+				GenerateTerrain t = TerrainHolder.getChunk(x, z);
 				if (t != null) {
 					entities.add(new Entity(staticModel, new Vector3f(x, t.getHeight(x, z, 1), z), t.getNormal(x, z).x,
 							t.getNormal(x, z).y, t.getNormal(x, z).z, 10f));
@@ -99,24 +101,24 @@ public class MainGameLoop {
 
 	public void render() {
 		camera.move();
-		player.move(terrain.getChunk(player.getPosition().x, player.getPosition().z));
+		player.move(TerrainHolder.getChunk(player.getPosition().x, player.getPosition().z));
 		GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 		fbos.bindReflectionFrameBuffer();
 		float distance = 2 * camera.getPosition().y;
 
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
-		renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, 1, 0, -0 + 1f));
+		renderer.render(light, camera, TerrainHolder.getTerrains(), entities, player, new Vector4f(0, 1, 0, -0 + 1f));
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		fbos.bindRefractionFrameBuffer();
-		renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, 0, 0, 0));
+		renderer.render(light, camera, TerrainHolder.getTerrains(), entities, player, new Vector4f(0, 0, 0, 0));
 
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		fbos.unbindCurrentFrameBuffer();
-		renderer.render(light, camera, terrain.getTerrains(), entities, player, new Vector4f(0, 0, 0, 10000));
-		waterRenderer.render(terrain.getWater(), camera, light);
+		renderer.render(light, camera, TerrainHolder.getTerrains(), entities, player, new Vector4f(0, 0, 0, 10000));
+		waterRenderer.render(TerrainHolder.getWater(), camera, light);
 
 		DisplayManager.updateDisplay();
 	}

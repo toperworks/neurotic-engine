@@ -1,6 +1,7 @@
 package net.render.water;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 
 import net.entities.Light;
 import net.render.Camera;
@@ -23,6 +24,7 @@ public class WaterShader extends Shader {
 	private int locationLightPos;
 	private int locationLightColor;
 	private int locationDepthMap;
+	private int locationSkyColor;
 
 	public WaterShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -47,11 +49,16 @@ public class WaterShader extends Shader {
 		locationLightColor = getUniformLocation("lightColor");
 		locationLightPos = getUniformLocation("lightPosition");
 		locationDepthMap = getUniformLocation("depthMap");
+		locationSkyColor = getUniformLocation("skyColor");
 	}
 
 	public void loadLight(Light sun) {
 		super.loadVector(locationLightColor, sun.getColor());
 		super.loadVector(locationLightPos, sun.getPosition());
+	}
+
+	public void loadSkyColor(Vector3f color) {
+		super.loadVector(locationSkyColor, color);
 	}
 
 	public void loadMoveFactor(float factor) {
